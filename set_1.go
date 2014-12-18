@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"strings"
 	"unsafe"
 )
 
@@ -75,36 +76,51 @@ func (xs ByScore) Less(i, j int) bool { return xs[i].score < xs[j].score }
 
 // major vowels after:
 // http://en.wikipedia.org/wiki/Letter_frequency#Relative_frequencies_of_letters_in_the_English_language
-var englishFreqs = map[byte]float64{
-	'e': 12.702,
-	'a': 8.167,
-	'o': 7.507,
-	'i': 6.996,
-	'u': 2.758,
+var englishFreqs = map[string]float64{
+	"e": 12.702,
+	"a": 8.167,
+	"o": 7.507,
+	"i": 6.996,
+	"u": 2.758,
 }
 
-func breakSimpleXOR(src string) ([]englishSample, error) {
-	dst, err := hex.DecodeString(src)
-	if err != nil {
-		return nil, err
+func breakSimpleXOR(src string, decode bool) ([]englishSample, error) {
+	var bsrc []byte
+	if decode {
+		var err error
+		bsrc, err = hex.DecodeString(src)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		bsrc = []byte(src)
 	}
-	n := float64(len(dst))
+	n := len(bsrc)
+	fN := float64(n)
 	nf := len(englishFreqs)
+	fNf := float64(nf)
+	dst := make([]byte, n)
 	out := make([]englishSample, 0, 128)
 	for k := byte(0); ; k++ {
-		freqs := make(map[byte]float64, nf)
-		for i, b := range dst {
-			p := b ^ k
-			dst[i] = p
+		freqs := make(map[string]float64, nf)
+		prnt := true
+		for i, b := range bsrc {
+			c := b ^ k
+			if (c < 32) || (c > 126) {
+				prnt = false
+				break
+			}
+			dst[i] = c
+			p := strings.ToLower(string(c))
 			if _, ok := englishFreqs[p]; ok {
 				freqs[p] += 1.0
 			}
 		}
-		score := float64(0)
-		for i, v := range freqs {
-			score += (math.Abs(englishFreqs[i]-(v/n)) / englishFreqs[i]) / float64(nf)
-		}
-		if score >= 0.75 {
+		if prnt {
+			score := float64(0)
+			for i, v := range freqs {
+				score += (math.Abs(englishFreqs[i]-(v/fN)) / englishFreqs[i]) / fNf
+			}
 			out = append(out, englishSample{score, string(dst), []byte{k}})
 		}
 		if k == 255 {

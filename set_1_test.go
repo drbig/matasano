@@ -62,7 +62,7 @@ func TestBreakSimpleXOR(t *testing.T) {
 	}
 
 	for i, c := range cases {
-		o, err := breakSimpleXOR(c.in)
+		o, err := breakSimpleXOR(c.in, true)
 		if err != nil {
 			t.Errorf("(%d) Error: %s", i+1, err)
 			continue
@@ -87,15 +87,15 @@ func TestMultiSimpleXOR(t *testing.T) {
 	scn := bufio.NewScanner(f)
 	i := 1
 	for scn.Scan() {
-		o, err := breakSimpleXOR(scn.Text())
+		o, err := breakSimpleXOR(scn.Text(), true)
 		if err != nil {
 			t.Errorf("(%d) Error: %s", i, err)
 		} else {
 			for j, s := range o {
-				t.Logf("(%d) (%d) %s", i, j+1, s)
 				if s.score < 0.50 {
 					break
 				}
+				t.Logf("(%d) (%d) %s", i, j+1, s)
 			}
 		}
 		i++
