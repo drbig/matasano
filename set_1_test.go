@@ -2,7 +2,9 @@ package cryptopals
 
 import (
 	"bufio"
+	"fmt"
 	"os"
+	"sort"
 	"testing"
 )
 
@@ -84,20 +86,28 @@ func TestMultiSimpleXOR(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer f.Close()
+	cands := make([]englishSample, 0, 128)
 	scn := bufio.NewScanner(f)
 	i := 1
 	for scn.Scan() {
-		o, err := breakSimpleXOR(scn.Text(), true)
+		txt := scn.Text()
+		o, err := breakSimpleXOR(txt, true)
 		if err != nil {
 			t.Errorf("(%d) Error: %s", i, err)
+			continue
 		} else {
 			for j, s := range o {
-				if s.score < 0.50 {
+				if s.score < 0.60 {
 					break
 				}
-				t.Logf("(%d) (%d) %s", i, j+1, s)
+				s.rest = fmt.Sprintf("line: %d", j+1)
+				cands = append(cands, s)
 			}
 		}
 		i++
+	}
+	sort.Sort(sort.Reverse(ByScore(cands)))
+	for i, c := range cands {
+		t.Logf("(%d) %s", i+1, c)
 	}
 }

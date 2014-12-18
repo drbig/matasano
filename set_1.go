@@ -62,10 +62,11 @@ type englishSample struct {
 	score float64
 	text  string
 	key   []byte
+	rest  string
 }
 
 func (i englishSample) String() string {
-	return fmt.Sprintf(`%f %v : "%s"`, i.score, i.key, i.text)
+	return fmt.Sprintf(`%f %v : "%s" rest: "%s"`, i.score, i.key, i.text, i.rest)
 }
 
 type ByScore []englishSample
@@ -78,10 +79,21 @@ func (xs ByScore) Less(i, j int) bool { return xs[i].score < xs[j].score }
 // http://en.wikipedia.org/wiki/Letter_frequency#Relative_frequencies_of_letters_in_the_English_language
 var englishFreqs = map[string]float64{
 	"e": 12.702,
+	"t": 9.056,
 	"a": 8.167,
 	"o": 7.507,
 	"i": 6.996,
+	"n": 6.749,
+	"s": 6.327,
+	"h": 6.094,
+	"r": 5.987,
+	"d": 4.253,
+	"l": 4.025,
+	"c": 2.782,
 	"u": 2.758,
+	"m": 2.406,
+	"w": 2.360,
+	"f": 2.228,
 }
 
 func breakSimpleXOR(src string, decode bool) ([]englishSample, error) {
@@ -96,7 +108,6 @@ func breakSimpleXOR(src string, decode bool) ([]englishSample, error) {
 		bsrc = []byte(src)
 	}
 	n := len(bsrc)
-	fN := float64(n)
 	nf := len(englishFreqs)
 	fNf := float64(nf)
 	dst := make([]byte, n)
@@ -104,6 +115,7 @@ func breakSimpleXOR(src string, decode bool) ([]englishSample, error) {
 	for k := byte(0); ; k++ {
 		freqs := make(map[string]float64, nf)
 		prnt := true
+		seen := float64(0)
 		for i, b := range bsrc {
 			c := b ^ k
 			if (c < 32) || (c > 126) {
@@ -114,14 +126,15 @@ func breakSimpleXOR(src string, decode bool) ([]englishSample, error) {
 			p := strings.ToLower(string(c))
 			if _, ok := englishFreqs[p]; ok {
 				freqs[p] += 1.0
+				seen += 1
 			}
 		}
 		if prnt {
 			score := float64(0)
 			for i, v := range freqs {
-				score += (math.Abs(englishFreqs[i]-(v/fN)) / englishFreqs[i]) / fNf
+				score += (math.Abs(englishFreqs[i]-(v/seen)) / englishFreqs[i]) / fNf
 			}
-			out = append(out, englishSample{score, string(dst), []byte{k}})
+			out = append(out, englishSample{score, string(dst), []byte{k}, ""})
 		}
 		if k == 255 {
 			break
