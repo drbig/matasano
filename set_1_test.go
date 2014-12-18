@@ -2,6 +2,7 @@ package cryptopals
 
 import (
 	"bufio"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"sort"
@@ -109,5 +110,25 @@ func TestMultiSimpleXOR(t *testing.T) {
 	sort.Sort(sort.Reverse(ByScore(cands)))
 	for i, c := range cands {
 		t.Logf("(%d) %s", i+1, c)
+	}
+}
+
+type caseRepXOR struct {
+	in, key []byte
+	out     string
+}
+
+func TestRepXOR(t *testing.T) {
+	cases := []caseRepXOR{
+		caseRepXOR{[]byte("Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal"), []byte("ICE"), "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"},
+	}
+
+	for i, c := range cases {
+		dst := make([]byte, len(c.in))
+		repXOR(dst, c.in, c.key)
+		o := hex.EncodeToString(dst)
+		if o != c.out {
+			t.Errorf("(%d) Mismatch: %s != %s", i+1, c.out, o)
+		}
 	}
 }

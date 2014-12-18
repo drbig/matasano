@@ -143,3 +143,12 @@ func breakSimpleXOR(src string, decode bool) ([]englishSample, error) {
 	sort.Sort(sort.Reverse(ByScore(out)))
 	return out, nil
 }
+
+// 1/5
+// plain []byte
+func repXOR(dst, src, key []byte) {
+	n := len(key)
+	for i, s := range src {
+		dst[i] = s ^ key[i%n]
+	}
+}
