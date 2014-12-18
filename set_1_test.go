@@ -1,6 +1,8 @@
 package cryptopals
 
 import (
+	"bufio"
+	"os"
 	"testing"
 )
 
@@ -73,5 +75,29 @@ func TestBreakSimpleXOR(t *testing.T) {
 		for j := 0; j < n; j++ {
 			t.Logf("(%d) %s", i+1, o[j])
 		}
+	}
+}
+
+func TestMultiSimpleXOR(t *testing.T) {
+	f, err := os.Open("data/1-4.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	scn := bufio.NewScanner(f)
+	i := 1
+	for scn.Scan() {
+		o, err := breakSimpleXOR(scn.Text())
+		if err != nil {
+			t.Errorf("(%d) Error: %s", i, err)
+		} else {
+			for j, s := range o {
+				t.Logf("(%d) (%d) %s", i, j+1, s)
+				if s.score < 0.50 {
+					break
+				}
+			}
+		}
+		i++
 	}
 }

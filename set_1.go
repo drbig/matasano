@@ -56,6 +56,7 @@ func fixedHexXOR(a, b string) (string, error) {
 
 // following is for the first 'challenge'
 // 1/3
+// also used for 1/4
 type englishSample struct {
 	score float64
 	text  string
