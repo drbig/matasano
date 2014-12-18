@@ -27,3 +27,24 @@ func TestHexToBase64(t *testing.T) {
 		}
 	}
 }
+
+type caseFixedHexXOR struct {
+	a, b, out string
+}
+
+func TestFixedHexXOR(t *testing.T) {
+	cases := []caseFixedHexXOR{
+		caseFixedHexXOR{"1c0111001f010100061a024b53535009181c", "686974207468652062756c6c277320657965", "746865206b696420646f6e277420706c6179"},
+	}
+
+	for i, c := range cases {
+		o, err := fixedHexXOR(c.a, c.b)
+		if err != nil {
+			t.Errorf("(%d) Error: %s", i+1, err)
+			continue
+		}
+		if o != c.out {
+			t.Errorf("(%d) Mismatch: %s != %s", i+1, c.out, o)
+		}
+	}
+}
