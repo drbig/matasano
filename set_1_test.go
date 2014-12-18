@@ -132,3 +132,23 @@ func TestRepXOR(t *testing.T) {
 		}
 	}
 }
+
+// 1/6
+// hammer time
+type caseNail struct {
+	a, b []byte
+	d    int
+}
+
+func TestHammer(t *testing.T) {
+	cases := []caseNail{
+		caseNail{[]byte{0}, []byte{1}, 1},
+		caseNail{[]byte("this is a test"), []byte("wokka wokka!!!"), 37},
+	}
+	for i, c := range cases {
+		d := hammer(c.a, c.b)
+		if d != c.d {
+			t.Errorf("(%d) Mismatch: %d != %d", i+1, c.d, d)
+		}
+	}
+}

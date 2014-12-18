@@ -152,3 +152,23 @@ func repXOR(dst, src, key []byte) {
 		dst[i] = s ^ key[i%n]
 	}
 }
+
+// 1/6
+// fun. below.
+
+// hammer the Hamming distance!
+func hammer(a, b []byte) int {
+	if len(a) != len(b) {
+		panic("broken hammer!!11!1!")
+	}
+	d := 0
+	for i, x := range a {
+		v := x ^ b[i]
+		c := 0
+		for ; v > 0; c++ {
+			v &= v - 1
+		}
+		d += c
+	}
+	return d
+}
