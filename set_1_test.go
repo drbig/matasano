@@ -48,3 +48,30 @@ func TestFixedHexXOR(t *testing.T) {
 		}
 	}
 }
+
+type caseBreakSimpleXOR struct {
+	in string
+	n  int
+}
+
+func TestBreakSimpleXOR(t *testing.T) {
+	cases := []caseBreakSimpleXOR{
+		caseBreakSimpleXOR{"1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736", 3},
+	}
+
+	for i, c := range cases {
+		o, err := breakSimpleXOR(c.in)
+		if err != nil {
+			t.Errorf("(%d) Error: %s", i+1, err)
+			continue
+		}
+		t.Logf("Case %d", i+1)
+		n := c.n
+		if len(o) < n {
+			n = len(o)
+		}
+		for j := 0; j < n; j++ {
+			t.Logf("(%d) %s", i+1, o[j])
+		}
+	}
+}
