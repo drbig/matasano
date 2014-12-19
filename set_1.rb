@@ -194,7 +194,7 @@ buckets = data.each_slice(keylen).to_a.transpose
 key = Array.new
 buckets.each do |b|
   xor_break_byte_padded(b).each do |(s, k)|
-    next if k > 127
+    next if k < 32 || k > 127
     key.push(k)
     break
   end
