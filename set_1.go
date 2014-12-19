@@ -94,6 +94,16 @@ var englishFreqs = map[string]float64{
 	"m": 2.406,
 	"w": 2.360,
 	"f": 2.228,
+	"g": 2.015,
+	"y": 1.974,
+	"p": 1.929,
+	"b": 1.492,
+	"v": 0.978,
+	"k": 0.772,
+	"j": 0.153,
+	"x": 0.150,
+	"q": 0.095,
+	"z": 0.074,
 }
 
 func breakSimpleXOR(src string, decode bool) ([]englishSample, error) {
@@ -108,34 +118,37 @@ func breakSimpleXOR(src string, decode bool) ([]englishSample, error) {
 		bsrc = []byte(src)
 	}
 	n := len(bsrc)
+	fN := float64(n)
 	nf := len(englishFreqs)
 	fNf := float64(nf)
 	dst := make([]byte, n)
 	out := make([]englishSample, 0, 128)
 	for k := byte(0); ; k++ {
 		freqs := make(map[string]float64, nf)
-		prnt := true
-		seen := float64(0)
+		//prnt := true
+		//seen := float64(0)
 		for i, b := range bsrc {
 			c := b ^ k
-			if (c < 32) || (c > 126) {
-				prnt = false
-				break
-			}
+			//if (c < 32) || (c > 126) {
+			//	if (c != '\n') || (c != '\r') {
+			//		prnt = false
+			//		break
+			//	}
+			//}
 			dst[i] = c
 			p := strings.ToLower(string(c))
 			if _, ok := englishFreqs[p]; ok {
 				freqs[p] += 1.0
-				seen += 1
+				//seen += 1
 			}
 		}
-		if prnt {
-			score := float64(0)
-			for i, v := range freqs {
-				score += (math.Abs(englishFreqs[i]-(v/seen)) / englishFreqs[i]) / fNf
-			}
-			out = append(out, englishSample{score, string(dst), []byte{k}, ""})
+		//if prnt {
+		score := float64(0)
+		for i, v := range freqs {
+			score += (math.Abs(englishFreqs[i]-(v/fN)) / englishFreqs[i]) / fNf
 		}
+		out = append(out, englishSample{score, string(dst), []byte{k}, ""})
+		//}
 		if k == 255 {
 			break
 		}
@@ -171,4 +184,41 @@ func hammer(a, b []byte) int {
 		d += c
 	}
 	return d
+}
+
+// ksg the key size guess
+func ksg(data []byte, n int) float64 {
+	if len(data) < 2*n {
+		panic("broken ksg!!!!11!")
+	}
+	a := data[0 : n-1]
+	b := data[n : 2*n-1]
+	return float64(hammer(a, b)) / float64(n)
+}
+
+type keySample struct {
+	dist float64
+	size int
+}
+
+func (k keySample) String() string {
+	return fmt.Sprintf("%d (%f)", k.size, k.dist)
+}
+
+type KeyByScore []keySample
+
+func (xs KeyByScore) Len() int           { return len(xs) }
+func (xs KeyByScore) Swap(i, j int)      { xs[i], xs[j] = xs[j], xs[i] }
+func (xs KeyByScore) Less(i, j int) bool { return xs[i].dist < xs[j].dist }
+
+func bestKSG(data []byte, from, to int) []keySample {
+	if to < from {
+		panic("broken bestKSG!!!1!")
+	}
+	samps := make([]keySample, 0, to-from)
+	for x := from; x < to; x++ {
+		samps = append(samps, keySample{ksg(data, x), x})
+	}
+	sort.Sort(KeyByScore(samps))
+	return samps
 }
