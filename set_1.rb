@@ -141,6 +141,41 @@ def guess_keylen(src, min, max)
   lens.sort! {|(a, _), (b, _)| b <=> a }
 end
 
+def xor_byte_padded(src, byte)
+  src.map do |e|
+    if e < 0
+      nil
+    else
+      e ^ byte
+    end
+  end.compact
+end
+
+def xor_break_byte_padded(ary)
+  l = ary.length.to_f
+  ls = ENGLISH.keys.length.to_f
+  keys = Array.new
+  0.upto(255) do |k|
+    freqs = Hash.new(0.0)
+    ok = true
+    xor_byte_padded(ary, k).each do |b|
+      if b > 127
+        ok = false
+        break
+      end
+      c = b.chr.downcase
+      freqs[c] += 1.0 if ENGLISH.has_key? c
+    end
+    next unless ok
+    score = 0.0
+    freqs.each_pair do |c, v|
+      score += ((ENGLISH[c] - (v / l)).abs / ENGLISH[c]) / ls
+    end
+    keys.push([score, k])
+  end
+  keys.sort! {|(a, _), (b, _)| b <=> a }
+end
+
 require 'base64'
 data = Array.new
 File.open('data/1-6.txt', 'r') do |f|
@@ -150,4 +185,18 @@ File.open('data/1-6.txt', 'r') do |f|
   end
 end
 pp data.length
-pp ks = guess_keylen(data, 2, 40)
+ks = guess_keylen(data, 2, 40)
+pp keylen = ks[0][1]
+pp padding = keylen - (data.length % keylen)
+data += [-1] * padding
+pp data.length
+buckets = data.each_slice(keylen).to_a.transpose
+key = Array.new
+buckets.each do |b|
+  xor_break_byte_padded(b).each do |(s, k)|
+    next if k > 127
+    key.push(k)
+    break
+  end
+end
+pp bytes2str(key)
