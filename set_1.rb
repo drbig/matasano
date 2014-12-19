@@ -97,6 +97,7 @@ def hamming(a, b)
 end
 
 #pp hamming('this is a test'.bytes, 'wokka wokka!!!'.bytes)
+#pp hamming('wokka wokka!!!'.bytes, 'this is a test'.bytes)
 #pp hamming([0], [1])
 #pp hamming([0], [3])
 
@@ -113,15 +114,31 @@ end
 #  end
 #end
 
+#def guess_keylen(src, min, max)
+#  l = src.length
+#  lens = Array.new
+#  min.upto(max) do |k|
+#    a = src.slice(0, k)
+#    b = src.slice(k, k)
+#    score = hamming(a, b).to_f / l.to_f
+#    lens.push([score, k])
+#  end
+#  lens.sort! {|(a, _), (b, _)| a <=> b }
+#end
+
 def guess_keylen(src, min, max)
+  l = src.length
   lens = Array.new
-  min.upto(max) do |l|
-    a = src.slice(0, l)
-    b = src.slice(l, l)
-    score = hamming(a, b).to_f / l.to_f
-    lens.push([score, l])
+  min.upto(max) do |k|
+    hits = 0
+    src.each_with_index do |b, i|
+      if b == src[i + k % l]
+        hits += 1
+      end
+    end
+    lens.push([hits, k])
   end
-  lens.sort! {|(a, _), (b, _)| a <=> b }
+  lens.sort! {|(a, _), (b, _)| b <=> a }
 end
 
 require 'base64'
