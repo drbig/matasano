@@ -240,4 +240,44 @@ def pkcs_pad(ary, len)
   ary.dup + ([b] * b)
 end
 
-pp bytes2str(pkcs_pad('YELLOW SUBMARINE'.bytes, 20))
+#pp bytes2str(pkcs_pad('YELLOW SUBMARINE'.bytes, 20))
+
+require 'openssl'
+@dec = OpenSSL::Cipher.new('AES-128-ECB')
+@enc = OpenSSL::Cipher.new('AES-128-ECB')
+
+def cbc_dec(src, key, iv)
+  xk = iv.dup
+  plain = Array.new
+  src.each_slice(key.length) do |b|
+    # seems we do need to reset everything for each block and
+    # the str to decrypt must have length > key length.
+    # i guess it's due to OpenSSL implementation quirkiness?
+    @dec.reset
+    @dec.decrypt
+    @dec.key = key
+    ob = @dec.update(bytes2str(b) + "\0")
+    plain += xor_two(ob.bytes, xk)
+    xk = b
+  end
+  plain
+end
+
+require 'base64'
+data = Array.new
+File.open('data/2-10.txt', 'r') do |f|
+  f.each_line do |l|
+    l.chop!
+    data += Base64.decode64(l).bytes
+  end
+end
+
+plain = cbc_dec(data, 'YELLOW SUBMARINE', [0] * 16)
+pp bytes2str(plain)
+
+#dec = OpenSSL::Cipher.new('AES-128-CBC')
+#dec.decrypt
+#dec.key = 'YELLOW SUBMARINE'
+#dec.iv = "\0" * 16
+#pp plain = dec.update(bytes2str(data)) + dec.final
+
