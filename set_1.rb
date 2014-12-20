@@ -204,18 +204,33 @@ end
 #plain = bytes2str(xor_mod(data, key.bytes))
 #puts plain if plain.ascii_only?
 
-require 'base64'
-require 'openssl'
-data = String.new
-File.open('data/1-7.txt', 'r') do |f|
+#require 'base64'
+#require 'openssl'
+#data = String.new
+#File.open('data/1-7.txt', 'r') do |f|
+#  f.each_line do |l|
+#    l.chop!
+#    data += Base64.decode64(l)
+#  end
+#end
+#cip = OpenSSL::Cipher.new('AES-128-ECB')
+#pp key = 'YELLOW SUBMARINE'
+#cip.decrypt
+#cip.key = key
+#plain = cip.update(data) + cip.final
+#puts plain if plain.ascii_only?
+
+data = Array.new
+File.open('data/1-8.txt', 'r') do |f|
   f.each_line do |l|
     l.chop!
-    data += Base64.decode64(l)
+    data.push(hex2bytes(l))
   end
 end
-cip = OpenSSL::Cipher.new('AES-128-ECB')
-pp key = 'YELLOW SUBMARINE'
-cip.decrypt
-cip.key = key
-plain = cip.update(data) + cip.final
-puts plain if plain.ascii_only?
+pp data.length
+scores = Array.new
+data.each_with_index do |b, i|
+  scores.push([i, guess_keylen(b, 2, b.length - 1).first])
+end
+scores.sort! {|(_, (x, _)), (_, (y, _))| y <=> x }
+pp scores
