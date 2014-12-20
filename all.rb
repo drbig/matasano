@@ -26,6 +26,7 @@ end
 #cip = xor_mod(src.bytes, 'ICE'.bytes)
 #pp bytes2hex(cip)
 
+# from http://en.wikipedia.org/wiki/Letter_frequency
 ENGLISH = {
   'e' => 12.702,
   't' => 9.056,
@@ -63,16 +64,19 @@ def xor_break_byte(ary)
     freqs = Hash.new(0.0)
     ok = true
     xor_byte(ary, k).each do |b|
+      # fast check if 'printable'
       if b > 127
         ok = false
         break
       end
+      # case-insensitive
       c = b.chr.downcase
       freqs[c] += 1.0 if ENGLISH.has_key? c
     end
     next unless ok
     score = 0.0
     freqs.each_pair do |c, v|
+      # we only care about the difference from the model
       score += ((ENGLISH[c] - (v / l)).abs / ENGLISH[c]) / ls
     end
     keys.push([score, k])
@@ -88,6 +92,7 @@ end
 def hamming(a, b)
   a.zip(b).inject(0) do |d, (x, y)|
     v = x ^ y
+    # using Kernighan method for bit counting
     while v > 0
       v &= v - 1
       d += 1
@@ -126,6 +131,9 @@ end
 #  lens.sort! {|(a, _), (b, _)| a <=> b }
 #end
 
+# the above function has been implemented as per the instructions.
+# i doesn't work, really. i guess it's probably me, but anyways, the
+# function below is much simpler and actually works.
 def guess_keylen(src, min, max)
   l = src.length
   lens = Array.new
@@ -141,6 +149,7 @@ def guess_keylen(src, min, max)
   lens.sort! {|(a, _), (b, _)| b <=> a }
 end
 
+# padded versions are here just to enable me to use Array#transpose later
 def xor_byte_padded(src, byte)
   src.map do |e|
     if e < 0
@@ -274,10 +283,3 @@ end
 
 plain = cbc_dec(data, 'YELLOW SUBMARINE', [0] * 16)
 pp bytes2str(plain)
-
-#dec = OpenSSL::Cipher.new('AES-128-CBC')
-#dec.decrypt
-#dec.key = 'YELLOW SUBMARINE'
-#dec.iv = "\0" * 16
-#pp plain = dec.update(bytes2str(data)) + dec.final
-
