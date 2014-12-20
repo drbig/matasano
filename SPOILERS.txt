@@ -1,0 +1,108 @@
+Output spoilers and some semi-helpful notes.
+
+1/1
+---
+
+"49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d"
+ =
+"SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t"
+ =
+"I'm killing your brain like a poisonous mushroom"
+
+1/2
+---
+
+"1c0111001f010100061a024b53535009181c"
+ XORed with
+"686974207468652062756c6c277320657965"
+ =
+"746865206b696420646f6e277420706c6179"
+ =
+"the kid don't play"
+ 
+1/3
+---
+
+You're looking for a key that produces output that best matches English ASCII text.
+There's more than one way to do it.
+
+"1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
+ XORed against
+"X" (dec 88)
+ =
+"436f6f6b696e67204d432773206c696b65206120706f756e64206f66206261636f6e"
+ =
+"Cooking MC's like a pound of bacon"
+
+1/4
+---
+
+Now it should be obvious that completing the previous challenge successfully makes
+this one a piece of cake.
+
+"7b5a4215415d544115415d5015455447414c155c46155f4058455c5b523f" (line 171)
+ XORed against
+"5" (dec 53)
+ =
+"4e6f77207468617420746865207061727479206973206a756d70696e670a"
+ =
+"Now that the party is jumping\n"
+
+1/5
+---
+
+I don't know how someone that can actually code can have any problems here.
+
+"Burning 'em, if you ain't quick and nimble
+I go crazy when I hear a cymbal"
+ XORed with repeating-key
+"ICE"
+ =
+"0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"
+
+1/6
+---
+
+This one is fun. My advice: forget the Hamming distance and the instructions of
+how to find the right key length. Instead try shifting the ciphertext and counting 
+bytes that match with the non-shifted ciphertext (for a range of shift values, where
+shift value = key length tested). Simple, free of any bit-twiddling, and working well.
+With my code the difference between the right key length and all others is at least 
+_three fold_ - the right key length just hits you in the face.
+
+Honest note: my code doesn't get the key case right, which is not surprising given
+my letter-frequency model is all lower-case. Still the key "TeRmINATOr X: bRinG THe noise" 
+it produces is _close enough_ to guess the proper key.
+
+Key size: 29
+Key: "Terminator X: Bring the noise"
+Decrypted output: I don't like pop-hop, so won't mention it.
+
+1/7
+---
+
+You should be using a language that has OpenSSL bindings.
+
+1/8
+---
+
+No idea (yet) if I got this right, but my current approach using the shifted-ciphertext 
+comparison (the same as in 1/6) favours the ciphertext at line 132. I might be right,
+I might be wrong.
+
+2/9
+---
+
+This is a no-brainer, especially if you don't care about errors.
+
+2/10
+----
+
+Again it seems OK to rely on AES-128-ECB from OpenSSL. If you're doing Ruby too be aware
+that the OpenSSL::Cipher seems to be a little quirky regarding the input to #update - make
+sure you always get the right thing back.
+
+In any case I believe the point here is to get the XORs and chaining right, which is why you
+should _not_ just use the CBC mode from OpenSSL directly.
+
+...rest is future...
