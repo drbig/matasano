@@ -220,17 +220,24 @@ end
 #plain = cip.update(data) + cip.final
 #puts plain if plain.ascii_only?
 
-data = Array.new
-File.open('data/1-8.txt', 'r') do |f|
-  f.each_line do |l|
-    l.chop!
-    data.push(hex2bytes(l))
-  end
+#data = Array.new
+#File.open('data/1-8.txt', 'r') do |f|
+#  f.each_line do |l|
+#    l.chop!
+#    data.push(hex2bytes(l))
+#  end
+#end
+#pp data.length
+#scores = Array.new
+#data.each_with_index do |b, i|
+#  scores.push([i, guess_keylen(b, 2, b.length - 1).first])
+#end
+#scores.sort! {|(_, (x, _)), (_, (y, _))| y <=> x }
+#pp scores
+
+def pkcs_pad(ary, len)
+  b = len - ary.length
+  ary.dup + ([b] * b)
 end
-pp data.length
-scores = Array.new
-data.each_with_index do |b, i|
-  scores.push([i, guess_keylen(b, 2, b.length - 1).first])
-end
-scores.sort! {|(_, (x, _)), (_, (y, _))| y <=> x }
-pp scores
+
+pp bytes2str(pkcs_pad('YELLOW SUBMARINE'.bytes, 20))
