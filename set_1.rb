@@ -188,9 +188,9 @@ pp data.length
 ks = guess_keylen(data, 2, 40)
 pp keylen = ks[0][1]
 pp padding = keylen - (data.length % keylen)
-data += [-1] * padding
-pp data.length
-buckets = data.each_slice(keylen).to_a.transpose
+pdata = data.dup + ([-1] * padding)
+pp pdata.length
+buckets = pdata.each_slice(keylen).to_a.transpose
 key = Array.new
 buckets.each do |b|
   xor_break_byte_padded(b).each do |(s, k)|
@@ -200,3 +200,6 @@ buckets.each do |b|
   end
 end
 pp bytes2str(key)
+pp key = 'Terminator X: Bring the noise'
+plain = bytes2str(xor_mod(data, key.bytes))
+puts plain if plain.ascii_only?
