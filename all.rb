@@ -272,14 +272,32 @@ def cbc_dec(src, key, iv)
   plain
 end
 
-require 'base64'
-data = Array.new
-File.open('data/2-10.txt', 'r') do |f|
-  f.each_line do |l|
-    l.chop!
-    data += Base64.decode64(l).bytes
+def cbc_enc(src, key, iv)
+  xk = iv.dup
+  ciph = Array.new
+  src.each_slice(key.length) do |b|
+    @enc.reset
+    @enc.encrypt
+    @enc.key = key
+    b = pkcs_pad(b, key.length) if b.length < key.length
+    ciph += xk = @enc.update(bytes2str(xor_two(b, xk)) + "\0").bytes
   end
+  ciph
 end
 
-plain = cbc_dec(data, 'YELLOW SUBMARINE', [0] * 16)
-pp bytes2str(plain)
+#require 'base64'
+#data = Array.new
+#File.open('data/2-10.txt', 'r') do |f|
+#  f.each_line do |l|
+#    l.chop!
+#    data += Base64.decode64(l).bytes
+#  end
+#end
+#plain = cbc_dec(data, 'YELLOW SUBMARINE', [0] * 16)
+#pp bytes2str(plain)
+
+c = cbc_enc(
+  'IBM invented the cipher-block chaining (CBC) mode of operation in 1976.'.bytes,
+  'YELLOW SUBMARINE', [0] * 16
+)
+pp bytes2str(cbc_dec(c, 'YELLOW SUBMARINE', [0] * 16))
