@@ -296,8 +296,38 @@ end
 #plain = cbc_dec(data, 'YELLOW SUBMARINE', [0] * 16)
 #pp bytes2str(plain)
 
-c = cbc_enc(
-  'IBM invented the cipher-block chaining (CBC) mode of operation in 1976.'.bytes,
-  'YELLOW SUBMARINE', [0] * 16
-)
-pp bytes2str(cbc_dec(c, 'YELLOW SUBMARINE', [0] * 16))
+#c = cbc_enc(
+#  'IBM invented the cipher-block chaining (CBC) mode of operation in 1976.'.bytes,
+#  'YELLOW SUBMARINE', [0] * 16
+#)
+#pp bytes2str(cbc_dec(c, 'YELLOW SUBMARINE', [0] * 16))
+
+def rand_bytes(len); 1.upto(len).collect { rand(256) }; end
+def rand_ascii(len); 1.upto(len).collect { 32 + rand(96) }; end
+
+@ecb = OpenSSL::Cipher.new('AES-128-ECB')
+@cbc = OpenSSL::Cipher.new('AES-128-CBC')
+
+def gen_crap(input)
+  c = 5 + rand(6)
+  src = rand_bytes(c) + input.bytes + rand_bytes(c)
+  if rand > 0.5
+    @cbc.reset
+    @cbc.encrypt
+    @cbc.key_len = 16
+    key = @cbc.random_key
+    iv = @cbc.random_iv
+    ciph = @cbc.update(bytes2str(src)) + @cbc.final
+    [:cbc, [input, src], [key, iv], ciph]
+  else
+    @ecb.reset
+    @ecb.encrypt
+    @ecb.key_len = 16
+    key = @ecb.random_key
+    ciph = @ecb.update(bytes2str(src)) + @ecb.final
+    [:ecb, [input, src], [key], ciph]
+  end
+end
+
+def mode_oracle(ciph)
+end
