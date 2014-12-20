@@ -176,30 +176,46 @@ def xor_break_byte_padded(ary)
   keys.sort! {|(a, _), (b, _)| b <=> a }
 end
 
+#require 'base64'
+#data = Array.new
+#File.open('data/1-6.txt', 'r') do |f|
+#  f.each_line do |l|
+#    l.chop!
+#    data += Base64.decode64(l).bytes
+#  end
+#end
+#pp data.length
+#ks = guess_keylen(data, 2, 40)
+#pp keylen = ks[0][1]
+#pp padding = keylen - (data.length % keylen)
+#pdata = data.dup + ([-1] * padding)
+#pp pdata.length
+#buckets = pdata.each_slice(keylen).to_a.transpose
+#key = Array.new
+#buckets.each do |b|
+#  xor_break_byte_padded(b).each do |(s, k)|
+#    next if k < 32 || k > 127
+#    key.push(k)
+#    break
+#  end
+#end
+#pp bytes2str(key)
+#pp key = 'Terminator X: Bring the noise'
+#plain = bytes2str(xor_mod(data, key.bytes))
+#puts plain if plain.ascii_only?
+
 require 'base64'
-data = Array.new
-File.open('data/1-6.txt', 'r') do |f|
+require 'openssl'
+data = String.new
+File.open('data/1-7.txt', 'r') do |f|
   f.each_line do |l|
     l.chop!
-    data += Base64.decode64(l).bytes
+    data += Base64.decode64(l)
   end
 end
-pp data.length
-ks = guess_keylen(data, 2, 40)
-pp keylen = ks[0][1]
-pp padding = keylen - (data.length % keylen)
-pdata = data.dup + ([-1] * padding)
-pp pdata.length
-buckets = pdata.each_slice(keylen).to_a.transpose
-key = Array.new
-buckets.each do |b|
-  xor_break_byte_padded(b).each do |(s, k)|
-    next if k < 32 || k > 127
-    key.push(k)
-    break
-  end
-end
-pp bytes2str(key)
-pp key = 'Terminator X: Bring the noise'
-plain = bytes2str(xor_mod(data, key.bytes))
+cip = OpenSSL::Cipher.new('AES-128-ECB')
+pp key = 'YELLOW SUBMARINE'
+cip.decrypt
+cip.key = key
+plain = cip.update(data) + cip.final
 puts plain if plain.ascii_only?
