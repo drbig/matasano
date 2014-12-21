@@ -307,6 +307,7 @@ def rand_ascii(len); 1.upto(len).collect { 32 + rand(96) }; end
 
 @ecb = OpenSSL::Cipher.new('AES-128-ECB')
 @cbc = OpenSSL::Cipher.new('AES-128-CBC')
+@keylen = 16
 
 def gen_crap(input)
   c = 5 + rand(6)
@@ -314,7 +315,7 @@ def gen_crap(input)
   if rand > 0.5
     @cbc.reset
     @cbc.encrypt
-    @cbc.key_len = 16
+    @cbc.key_len = @keylen
     key = @cbc.random_key
     iv = @cbc.random_iv
     ciph = @cbc.update(bytes2str(src)) + @cbc.final
@@ -322,12 +323,35 @@ def gen_crap(input)
   else
     @ecb.reset
     @ecb.encrypt
-    @ecb.key_len = 16
+    @ecb.key_len = @keylen
     key = @ecb.random_key
     ciph = @ecb.update(bytes2str(src)) + @ecb.final
     [:ecb, [input, src], [key], ciph]
   end
 end
 
-def mode_oracle(ciph)
+def mode_oracle(len, samples, keylen)
+  s = len * samples
+  c = gen_crap(('A' * len) * samples)
+  ch = c.last.bytes
+  r = ch.length - s
+  b = [0, 0]
+  0.upto(r) do |o|
+    i = ch.slice(o, s)
+    g = guess_keylen(i, 2, keylen).first
+    if g.first > b.first
+      b = g
+    end
+  end
+  # this might even guess the keylength
+  #[c.first, @key.length, b]
+  if b.first > 10
+    [c.first, :ecb]
+  else
+    [c.first, :cbc]
+  end
+end
+
+1.upto(16) do |i|
+  pp [i, mode_oracle(4, 16, 32)]
 end
