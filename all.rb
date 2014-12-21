@@ -410,21 +410,8 @@ end
 #
 #pp mode_oracle_12(4, 16, 32)
 
-pp bsize = 128
-
-#puts 'making dictionary...'
-#dict = Array.new(256, 0)
-#0.upto(255) do |b|
-#  c = oracle_12(('A' * (bsize - 1)) + b.chr).bytes
-#  dict[b] = c[bsize-1]
-#end
-#
-#c = oracle_12('A' * (bsize - 1)).bytes
-#c1 = c[bsize - 1]
-#
-#p1 = dict.index(c1)
-#puts "#{c1} -> #{p1} \"#{p1.chr}\""
-
+# break simple ecb
+pp bsize = 128 # @unknown_str rounded to block sizes
 plain = Array.new
 
 1.upto(117) do |x|
