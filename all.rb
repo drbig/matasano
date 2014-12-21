@@ -358,8 +358,7 @@ end
 
 require 'base64'
 @unknown_str = Base64.decode64('Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHddXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QYnkK')
-#pp @key = bytes2str(rand_ascii(16))
-pp @key = 'YELLOW SUBMARINE'
+pp @key = bytes2str(rand_ascii(16))
 
 def oracle_12(input)
   src = input + @unknown_str
@@ -411,19 +410,34 @@ end
 #
 #pp mode_oracle_12(4, 16, 32)
 
-#pp @unknown_str.length
+pp bsize = 128
 
-pp bsize = 16
+#puts 'making dictionary...'
+#dict = Array.new(256, 0)
+#0.upto(255) do |b|
+#  c = oracle_12(('A' * (bsize - 1)) + b.chr).bytes
+#  dict[b] = c[bsize-1]
+#end
+#
+#c = oracle_12('A' * (bsize - 1)).bytes
+#c1 = c[bsize - 1]
+#
+#p1 = dict.index(c1)
+#puts "#{c1} -> #{p1} \"#{p1.chr}\""
 
-puts 'making dictionary...'
-dict = Array.new(256, 0)
-0.upto(255) do |b|
-  c = oracle_12(('A' * (bsize -1)) + b.chr).bytes
-  dict[b] = c[bsize-1]
+plain = Array.new
+
+1.upto(117) do |x|
+  dict = Hash.new
+  0.upto(255) do |b|
+    src = ('A' * (bsize - x)) + plain.join + b.chr
+    c = oracle_12(src).bytes.slice(0, bsize)
+    dict[c] = b
+  end
+  cb = oracle_12('A' * (bsize - x)).bytes.slice(0, bsize)
+  plain.push(dict[cb].chr)
+  print '.'
 end
-
-c = oracle_12('A' * (bsize - 1)).bytes
-c1 = c[bsize - 1]
-
-p1 = dict.index(c1)
-puts "#{c1} -> #{p1} \"#{p1.chr}\""
+puts
+pp plain.join
+pp plain.join == @unknown_str
