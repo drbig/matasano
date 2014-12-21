@@ -356,16 +356,27 @@ end
 #  pp [i, mode_oracle(4, 16, 32)]
 #end
 
-require 'base64'
-@unknown_str = Base64.decode64('Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHddXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QYnkK')
-pp @key = bytes2str(rand_ascii(16))
+#require 'base64'
+#@unknown_str = Base64.decode64('Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHddXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QYnkK')
+#pp @key = bytes2str(rand_ascii(16))
 
-def oracle_12(input)
-  src = input + @unknown_str
+def ecb_enc(input)
   @ecb.reset
   @ecb.encrypt
   @ecb.key = @key
-  @ecb.update(src) + @ecb.final
+  @ecb.update(input) + @ecb.final
+end
+
+def ecb_dec(input)
+  @ecb.reset
+  @ecb.decrypt
+  @ecb.key = @key
+  @ecb.update(input) + @ecb.final
+end
+
+def oracle_12(input)
+  src = input + @unknown_str
+  ecb_enc(src)
 end
 
 # ok, i got it now. the block size is the cipher bit size,
@@ -411,20 +422,51 @@ end
 #pp mode_oracle_12(4, 16, 32)
 
 # break simple ecb
-pp bsize = 128 # @unknown_str rounded to block sizes
-plain = Array.new
+#pp bsize = 128 # @unknown_str rounded to block sizes
+#plain = Array.new
+#
+#1.upto(117) do |x|
+#  dict = Hash.new
+#  0.upto(255) do |b|
+#    src = ('A' * (bsize - x)) + plain.join + b.chr
+#    c = oracle_12(src).bytes.slice(0, bsize)
+#    dict[c] = b
+#  end
+#  cb = oracle_12('A' * (bsize - x)).bytes.slice(0, bsize)
+#  plain.push(dict[cb].chr)
+#  print '.'
+#end
+#puts
+#pp plain.join
+#pp plain.join == @unknown_str
+#
+# 2/13
+# musings:
+# email=123456789&uid=10&role=user
+# | 0            | 15            | 23
 
-1.upto(117) do |x|
-  dict = Hash.new
-  0.upto(255) do |b|
-    src = ('A' * (bsize - x)) + plain.join + b.chr
-    c = oracle_12(src).bytes.slice(0, bsize)
-    dict[c] = b
-  end
-  cb = oracle_12('A' * (bsize - x)).bytes.slice(0, bsize)
-  plain.push(dict[cb].chr)
-  print '.'
-end
-puts
-pp plain.join
-pp plain.join == @unknown_str
+require 'uri'
+
+def parse_profile(str); Hash[URI.decode_www_form(str)]; end
+def profile_for(email); "email=#{email.gsub(/=|&/, '')}&uid=10&role=user"; end
+
+pp @key = bytes2str(rand_ascii(16))
+
+#pp p = profile_for('foo@bar.com')
+#c = ecb_enc(p)
+#dp = ecb_dec(c)
+#pp parse_profile(dp)
+
+# 2/13 solution that works if we can sneak in non-ascii bytes
+# (though _not_ & or = obviously)
+magic = bytes2str(pkcs_pad('admin'.bytes, 16))
+pp ip = profile_for('1234567890' + magic)
+pp cip = ecb_enc(ip)
+pp cmagic = cip.bytes.slice(16, 16)
+
+pp ap = profile_for('1234567891234')
+pp cap = ecb_enc(ap)
+attack = cap.bytes.slice(0, 32) + cmagic
+
+pp dp = ecb_dec(bytes2str(attack))
+pp parse_profile(dp)
