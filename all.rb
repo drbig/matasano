@@ -352,6 +352,78 @@ def mode_oracle(len, samples, keylen)
   end
 end
 
-1.upto(16) do |i|
-  pp [i, mode_oracle(4, 16, 32)]
+#1.upto(16) do |i|
+#  pp [i, mode_oracle(4, 16, 32)]
+#end
+
+require 'base64'
+@unknown_str = Base64.decode64('Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHddXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QYnkK')
+#pp @key = bytes2str(rand_ascii(16))
+pp @key = 'YELLOW SUBMARINE'
+
+def oracle_12(input)
+  src = input + @unknown_str
+  @ecb.reset
+  @ecb.encrypt
+  @ecb.key = @key
+  @ecb.update(src) + @ecb.final
 end
+
+# ok, i got it now. the block size is the cipher bit size,
+# e.g. for AES I have 128 bits (16 bytes), 192 bits (24 bytes) and
+# 256 bytes (32 bytes). for OpenSSL it seems that the key length has
+# to be at least the block length - but key data after the block length
+# is never used! e.g. under AES128 keys 'YELLOW SUBMARINE' and
+# 'YELLOW SUBMARINE SECRET' both produce _the same output_.
+# so having a 128 character passphrase is a waste and false sense of
+# better security if a site uses 128 bit block size...
+#
+# discover block size
+#pp i = oracle_12('A').bytes.first
+#2.upto(32) do |o|
+#  c = oracle_12('A' * o).bytes
+#  pp c.slice(0, o)
+#  if c[o-1] == i
+#    puts "block size: #{o-1}"
+#    break
+#  end
+#end
+
+# test if ecb
+#def mode_oracle_12(len, samples, keylen)
+#  s = len * samples
+#  ch = oracle_12(('A' * len) * samples).bytes
+#  r = ch.length - s
+#  b = [0, 0]
+#  0.upto(r) do |o|
+#    i = ch.slice(o, s)
+#    g = guess_keylen(i, 2, keylen).first
+#    if g.first > b.first
+#      b = g
+#    end
+#  end
+#  if b.first > 10
+#    :ecb
+#  else
+#    :cbc
+#  end
+#end
+#
+#pp mode_oracle_12(4, 16, 32)
+
+#pp @unknown_str.length
+
+pp bsize = 16
+
+puts 'making dictionary...'
+dict = Array.new(256, 0)
+0.upto(255) do |b|
+  c = oracle_12(('A' * (bsize -1)) + b.chr).bytes
+  dict[b] = c[bsize-1]
+end
+
+c = oracle_12('A' * (bsize - 1)).bytes
+c1 = c[bsize - 1]
+
+p1 = dict.index(c1)
+puts "#{c1} -> #{p1} \"#{p1.chr}\""
