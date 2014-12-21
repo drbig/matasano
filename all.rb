@@ -442,8 +442,9 @@ end
 #
 # 2/13
 # musings:
-# email=123456789&uid=10&role=user
-# | 0            | 15            | 23
+# email=1234567890&uid=10&role=user
+# | 0             | 16            | 32
+# email=123456789@aaaaaa&role=admin&uid=10
 
 require 'uri'
 
