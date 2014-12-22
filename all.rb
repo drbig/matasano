@@ -654,29 +654,74 @@ end
 pp src = 'YELLOW RUBMARINEYELLOW SUBMARINE'
 pp cip = penc(src)
 #pp pdec(cip)
-pp src.bytes.each_slice(16).to_a.map {|e| bytes2str(e) }
+#pp src.bytes.each_slice(16).to_a.map {|e| bytes2str(e) }
+#
+#def calc_attack(plain, cipher, pos)
+#  attack = "\0" * 16
+#  pad = 16 - pos
+#  14.downto(pos) do |i|
+#    attack[i+1] = (pad ^ plain[i+1].ord ^ cipher[i+1].ord).chr
+#  end
+#  attack
+#end
+#
+#pp blocks = cip.bytes.each_slice(16).to_a.map {|e| bytes2str(e) }
+#plain = " " * 16
+#attack = "\0" * 16
+#15.downto(0) do |x|
+#  0.upto(255) do |b|
+#    attack[x] = b.chr
+#    if pdec(attack + blocks[1])
+#      plain[x] = ((16 - x) ^ blocks[0][x].ord ^ attack[x].ord).chr
+#      attack = calc_attack(plain, blocks[0], x-1)
+#      break
+#    end
+#  end
+#  pp plain
+#end
 
-def calc_attack_other(plain, cipher, pos)
-  attack = "\0" * 16
-  pad = 16 - pos
-  14.downto(pos) do |i|
-    attack[i+1] = (pad ^ plain[i+1].ord ^ cipher[i+1].ord).chr
-  end
-  attack
-end
+# lets write a proper oracle function, all glory!?
+# ugly as x86, and surely much slower
+def padding_oracle(cipher, opts = {}, &oracle)
+  return nil if oracle.nil?
 
-pp blocks = cip.bytes.each_slice(16).to_a.map {|e| bytes2str(e) }
-plain = " " * 16
-attack = "\0" * 16
-15.downto(0) do |x|
-  0.upto(255) do |b|
-    attack[x] = b.chr
-    if pdec(attack + blocks[1])
-      plain[x] = ((16 - x) ^ blocks[0][x].ord ^ attack[x].ord).chr
-      attack = calc_attack_other(plain, blocks[0], x-1)
-      break
+  size = opts[:blocksize] || 16
+  iv = opts[:iv] || false
+
+  plains = Array.new
+  cbs = cipher.bytes.each_slice(size).to_a
+  last = 1
+  last = 0 if iv
+
+  def make_attack(plain, cipher, pos, size)
+    attack = "\0" * size
+    pad = size - pos
+    (size-2).downto(pos) do |i|
+      attack[i+1] = (pad ^ plain[i+1].ord ^ cipher[i+1]).chr
     end
+    attack
   end
-  pp plain
+
+  (cbs.length - 1).downto(last) do |ib|
+    p = " " * size
+    a = "\0" * size
+    pb = cbs[ib - 1]
+    pb = iv if ib - 1 < 0
+    (size - 1).downto(0) do |i|
+      0.upto(255) do |b|
+        a[i] = b.chr
+        if oracle.call(a + bytes2str(cbs[ib]))
+          p[i] = ((size - i) ^ pb[i] ^ a[i].ord).chr
+          a = make_attack(p, pb, i-1, size)
+          break
+        end
+      end
+    end
+    plains.unshift(p.dup)
+  end
+  plains.join
 end
 
+rec = padding_oracle(cip, :iv => @iv.bytes) {|i| pdec(i) }
+pp [cip.length, rec.length]
+pp pkcs_check(rec, false) || rec
