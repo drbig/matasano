@@ -651,8 +651,8 @@ def pdec(str)
   end
 end
 
-pp src = 'YELLOW RUBMARINEYELLOW SUBMARINE'
-pp cip = penc(src)
+#pp src = 'YELLOW RUBMARINEYELLOW SUBMARINE'
+#pp cip = penc(src)
 #pp pdec(cip)
 #pp src.bytes.each_slice(16).to_a.map {|e| bytes2str(e) }
 #
@@ -722,6 +722,29 @@ def padding_oracle(cipher, opts = {}, &oracle)
   plains.join
 end
 
-rec = padding_oracle(cip, :iv => @iv.bytes) {|i| pdec(i) }
-pp [cip.length, rec.length]
-pp pkcs_check(rec, false) || rec
+#rec = padding_oracle(cip, :iv => @iv.bytes) {|i| pdec(i) }
+#pp [cip.length, rec.length]
+#pp pkcs_check(rec, false) || rec
+
+# 3/17 proper, so to say
+# i assume i get the iv. and now i know that normally i wouldn't
+require 'base64'
+
+PLAINS = [
+  'MDAwMDAwTm93IHRoYXQgdGhlIHBhcnR5IGlzIGp1bXBpbmc=',
+  'MDAwMDAxV2l0aCB0aGUgYmFzcyBraWNrZWQgaW4gYW5kIHRoZSBWZWdhJ3MgYXJlIHB1bXBpbic=',
+  'MDAwMDAyUXVpY2sgdG8gdGhlIHBvaW50LCB0byB0aGUgcG9pbnQsIG5vIGZha2luZw==',
+  'MDAwMDAzQ29va2luZyBNQydzIGxpa2UgYSBwb3VuZCBvZiBiYWNvbg==',
+  'MDAwMDA0QnVybmluZyAnZW0sIGlmIHlvdSBhaW4ndCBxdWljayBhbmQgbmltYmxl',
+  'MDAwMDA1SSBnbyBjcmF6eSB3aGVuIEkgaGVhciBhIGN5bWJhbA==',
+  'MDAwMDA2QW5kIGEgaGlnaCBoYXQgd2l0aCBhIHNvdXBlZCB1cCB0ZW1wbw==',
+  'MDAwMDA3SSdtIG9uIGEgcm9sbCwgaXQncyB0aW1lIHRvIGdvIHNvbG8=',
+  'MDAwMDA4b2xsaW4nIGluIG15IGZpdmUgcG9pbnQgb2g=',
+  'MDAwMDA5aXRoIG15IHJhZy10b3AgZG93biBzbyBteSBoYWlyIGNhbiBibG93'
+].map {|e| Base64.decode64(e) }
+
+pp seli = rand(PLAINS.length)
+enc = penc(PLAINS[seli])
+plain = padding_oracle(enc, :iv => @iv.bytes) {|i| pdec(i) }
+pp [enc.length, plain.length]
+pp pkcs_check(plain, false) || plain
