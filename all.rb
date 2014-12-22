@@ -566,7 +566,57 @@ def pkcs_check(str, blow)
   end
 end
 
-pp pkcs_check("ICE ICE BABY\x04\x04\x04\x04", false)
-pp pkcs_check("ICE ICE BABY\x05\x05\x05\x05", false)
-pp pkcs_check("ICE ICE BABY\x01\x02\x03\x04", false)
-pp pkcs_check("ICE ICE BABY\x01\x03\x03\x03", false)
+def pkcs_check_bytes(ary)
+  l = ary.last
+  return ary if l > 64
+  if ary.slice(-l, l).all? {|e| e == l }
+    ary.slice(0, ary.length - l)
+  else
+    raise PKCSError
+  end
+end
+
+#pp pkcs_check("ICE ICE BABY\x04\x04\x04\x04", false)
+#pp pkcs_check("ICE ICE BABY\x05\x05\x05\x05", false)
+#pp pkcs_check("ICE ICE BABY\x01\x02\x03\x04", false)
+#pp pkcs_check("ICE ICE BABY\x01\x03\x03\x03", false)
+
+# 2/16
+# this was much easier than I thought, as it seems one can do multiple 1-bit
+# edits to a block and have it 'edit' the next block!
+require 'uri'
+pp @key = bytes2str(rand_ascii(16))
+
+def gen_comment(data)
+  src = "comment1=cooking%20MCs;#{URI.encode_www_form({:userdata => data})};comment2=%20like%20a%20pound%20of%20bacon".bytes
+  cbc_enc(src, @key, [0]*16)
+end
+
+def parse_comment(ciph)
+  data = bytes2str(pkcs_check_bytes(cbc_dec(ciph, @key, [0]*16)))
+  out = Hash.new
+  # yeah, non-ascii trips it up, as it should
+  #data.split(';').map do |e|
+  #  k, v = URI.decode_www_form(e).first
+  #  out[k] = v
+  #end
+  # relaxed
+  data.split(';').map do |e|
+    k, v = e.split('=')
+    out[k] = v
+  end
+  [out['admin'] == 'true', out]
+end
+
+# use hamming for finding these, e.g.:
+# 32.upto(126).map {|b| hamming([b], [';'.ord]) == 1 ? b.chr : nil }.compact
+# and then just:
+# '3'.ord ^ ';'.ord
+#
+# ';' at 5
+# '=' at 11
+cc = gen_comment('AAAAA1AAAAA2AAAA' + 'aaaaa3admin5true')
+cc[32+5] ^= 8
+cc[32+11] ^= 8
+pp parse_comment(cc)
+
