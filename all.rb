@@ -356,10 +356,10 @@ end
 #  pp [i, mode_oracle(4, 16, 32)]
 #end
 
-require 'base64'
-@unknown_str = Base64.decode64('Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHddXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QYnkK')
-pp @unknown_str.length
-pp @key = bytes2str(rand_ascii(16))
+#require 'base64'
+#@unknown_str = Base64.decode64('Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHddXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QYnkK')
+#pp @unknown_str.length
+#pp @key = bytes2str(rand_ascii(16))
 
 def ecb_enc(input)
   @ecb.reset
@@ -492,63 +492,81 @@ end
 # when the random crap is exactly 16 bytes long (128 + 16 + 16 = 160),
 # where the OpenSSL encryption will presumably throw in one more block
 # with nothing by padding. at least this how i understand it.
-last = nil
-while true
-  print '.'
-  o = oracle_12h('A' * (11 + 16))
-  cip = o.last.bytes
-  pp [o.first, cip.length]
-  if cip.length == 176
-    puts
-    last = cip.slice(-16, 16)
-    break
-  end
-end
-pp last
+#last = nil
+#while true
+#  print '.'
+#  o = oracle_12h('A' * (11 + 16))
+#  cip = o.last.bytes
+#  pp [o.first, cip.length]
+#  if cip.length == 176
+#    puts
+#    last = cip.slice(-16, 16)
+#    break
+#  end
+#end
+#pp last
 # now i know that a 176 bytes cipher text which maches the last block
 # is boundary-aligned.
 
-pp bsize = 128 # @unknown_str rounded to block sizes
-plain = Array.new
-
-1.upto(117) do |x|
-  dict = Hash.new
-  0.upto(255) do |b|
-    # i repliacte my alignment but add the 128 bytes block for dictionary
-    # generation (176 + 128 = 304)
-    src = ('F' * 16) + ('A' * (bsize - x)) + plain.join + b.chr + ('F' * 11)
-    while true
-      cip = oracle_12h(src).last.bytes
-      next unless cip.length == 304
-      if cip.slice(-16, 16) == last
-        print '='
-        c = cip.slice(32, bsize)
-        dict[c] = b
-        break
-      end
-    end
-  end
-  # for this part i don't even need to care about the random bytes.
-  # my dict has all possible valid ciphertexts anyway, so I just try
-  # until the random crap is 0 bytes, and the first bsize bytes
-  # of ciphertext are found in the dict
-  fsrc = ('A' * (bsize - x))
-  cb = nil
-  while true
-    cib = oracle_12h(fsrc).last.bytes
-    cb = cib.slice(0, bsize)
-    if dict.has_key? cb
-      plain.push(dict[cb].chr)
-      print '!'
-      break
-    else
-      print ','
-    end
-  end
-end
-puts
-pp plain.join
-pp plain.join == @unknown_str
+#pp bsize = 128 # @unknown_str rounded to block sizes
+#plain = Array.new
+#
+#1.upto(117) do |x|
+#  dict = Hash.new
+#  0.upto(255) do |b|
+#    # i repliacte my alignment but add the 128 bytes block for dictionary
+#    # generation (176 + 128 = 304)
+#    src = ('F' * 16) + ('A' * (bsize - x)) + plain.join + b.chr + ('F' * 11)
+#    while true
+#      cip = oracle_12h(src).last.bytes
+#      next unless cip.length == 304
+#      if cip.slice(-16, 16) == last
+#        print '='
+#        c = cip.slice(32, bsize)
+#        dict[c] = b
+#        break
+#      end
+#    end
+#  end
+#  # for this part i don't even need to care about the random bytes.
+#  # my dict has all possible valid ciphertexts anyway, so I just try
+#  # until the random crap is 0 bytes, and the first bsize bytes
+#  # of ciphertext are found in the dict
+#  fsrc = ('A' * (bsize - x))
+#  cb = nil
+#  while true
+#    cib = oracle_12h(fsrc).last.bytes
+#    cb = cib.slice(0, bsize)
+#    if dict.has_key? cb
+#      plain.push(dict[cb].chr)
+#      print '!'
+#      break
+#    else
+#      print ','
+#    end
+#  end
+#end
+#puts
+#pp plain.join
+#pp plain.join == @unknown_str
 
 # it works, and i know my dict generation is far from the most efficient one
 # but it works and is fast enough (i.e. no time to make tea)
+
+# 2/15
+class PKCSError < Exception; end
+def pkcs_check(str, blow)
+  l = str.bytes.last
+  return str if l > 64
+  if str.bytes.slice(-l, l).all? {|e| e == l }
+    str.slice(0, str.length - l)
+  else
+    raise PKCSError if blow
+    false
+  end
+end
+
+pp pkcs_check("ICE ICE BABY\x04\x04\x04\x04", false)
+pp pkcs_check("ICE ICE BABY\x05\x05\x05\x05", false)
+pp pkcs_check("ICE ICE BABY\x01\x02\x03\x04", false)
+pp pkcs_check("ICE ICE BABY\x01\x03\x03\x03", false)
