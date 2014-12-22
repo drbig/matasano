@@ -356,11 +356,14 @@ end
 #  pp [i, mode_oracle(4, 16, 32)]
 #end
 
-#require 'base64'
-#@unknown_str = Base64.decode64('Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHddXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QYnkK')
+require 'base64'
+@unknown_str = Base64.decode64('Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHddXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QYnkK')
+pp @unknown_str.length
 #pp @key = bytes2str(rand_ascii(16))
+pp @key = 'YELLOW SUBMARINE'
 
 def ecb_enc(input)
+  #pp input.length
   @ecb.reset
   @ecb.encrypt
   @ecb.key = @key
@@ -371,7 +374,7 @@ def ecb_dec(input)
   @ecb.reset
   @ecb.decrypt
   @ecb.key = @key
-  @ecb.update(input) + @ecb.final
+  @ecb.update(input)# + @ecb.final
 end
 
 def oracle_12(input)
@@ -439,19 +442,19 @@ end
 #puts
 #pp plain.join
 #pp plain.join == @unknown_str
-#
+
 # 2/13
 # musings:
 # email=1234567890&uid=10&role=user
 # | 0             | 16            | 32
 # email=123456789@aaaaaa&role=admin&uid=10
 
-require 'uri'
-
-def parse_profile(str); Hash[URI.decode_www_form(str)]; end
-def profile_for(email); "email=#{email.gsub(/=|&/, '')}&uid=10&role=user"; end
-
-pp @key = bytes2str(rand_ascii(16))
+#require 'uri'
+#
+#def parse_profile(str); Hash[URI.decode_www_form(str)]; end
+#def profile_for(email); "email=#{email.gsub(/=|&/, '')}&uid=10&role=user"; end
+#
+#pp @key = bytes2str(rand_ascii(16))
 
 #pp p = profile_for('foo@bar.com')
 #c = ecb_enc(p)
@@ -460,14 +463,114 @@ pp @key = bytes2str(rand_ascii(16))
 
 # 2/13 solution that works if we can sneak in non-ascii bytes
 # (though _not_ & or = obviously)
-magic = bytes2str(pkcs_pad('admin'.bytes, 16))
-pp ip = profile_for('1234567890' + magic)
-pp cip = ecb_enc(ip)
-pp cmagic = cip.bytes.slice(16, 16)
+#magic = bytes2str(pkcs_pad('admin'.bytes, 16))
+#pp ip = profile_for('1234567890' + magic)
+#pp cip = ecb_enc(ip)
+#pp cmagic = cip.bytes.slice(16, 16)
+#
+#pp ap = profile_for('1234567891234')
+#pp cap = ecb_enc(ap)
+#attack = cap.bytes.slice(0, 32) + cmagic
+#
+#pp dp = ecb_dec(bytes2str(attack))
+#pp parse_profile(dp)
 
-pp ap = profile_for('1234567891234')
-pp cap = ecb_enc(ap)
-attack = cap.bytes.slice(0, 32) + cmagic
+# 2/14
 
-pp dp = ecb_dec(bytes2str(attack))
-pp parse_profile(dp)
+def oracle_12h(input)
+  l = rand(17)
+  c = oracle_12(bytes2str(rand_bytes(l)) + input)
+  [l, c]
+end
+
+# <scratch>
+#1.upto(32) do |x|
+#  o = oracle_12h('A' * 10)
+#  cip = o.last
+#  pp [x, o[0], cip.length]
+#end
+# </scratch>
+#
+# the only way i see now to get this done is to be able
+# to tell if i'm block-boundary aligned
+#
+# let's say i know the random crap can be 0 - blocksize in length
+# (general: i can figure out the length range of the random crap)
+# 
+# given that i know that the runs i...
+# scratch
+# let's make it simpler: i know the target-bytes length
+# so i align the target-bytes by one-byte-short
+# now if the random crap is extacly 1 i get a block-shorter ciphertext
+# and the last block is exactly the last full block of unknown bytes
+last = nil
+while true
+  print '.'
+  o = oracle_12h('A' * (11 + 16)) # 128 - 117 - 1 = 10
+  cip = o.last.bytes
+  pp [o.first, cip.length]
+  #print cip.length # yeah, i'm stupid
+  if cip.length == 176
+    puts
+    last = cip.slice(-16, 16)
+    break
+  end
+end
+pp last
+# so now i know how the cipher looks if the last block of target-bytes
+# is block-aligned. hmm... ok, i need to maintain my alignment
+
+#puts 'NOT YET!'
+#exit
+
+pp bsize = 128 # @unknown_str rounded to block sizes
+plain = Array.new
+
+1.upto(117) do |x|
+  dict = Hash.new
+  0.upto(255) do |b|
+    # fugde it so that the last target-bytes are fully within the block-length
+    # if the random-crap len is 1
+    src = ('F' * 16) + ('A' * (bsize - x)) + plain.join + b.chr + ('F' * 11)
+    while true
+      cip = oracle_12h(src).last.bytes
+      next unless cip.length == 304
+      if cip.slice(-16, 16) == last
+        print '='
+        c = cip.slice(32, bsize)
+        dict[c] = b
+        break
+      else
+        #print '.'
+      end
+    end
+    #.bytes.slice(0, bsize)
+    #dict[c] = b
+  end
+  fsrc = ('A' * (bsize - x))
+  cb = nil
+  while true
+    cib = oracle_12h(fsrc).last.bytes
+    cb = cib.slice(0, bsize)
+    if dict.has_key? cb
+      plain.push(dict[cb].chr)
+      print '!'
+      break
+    else
+      print ','
+    end
+
+    #if cib.slice(-16, 16) == last
+    #  print '+'
+    #  cb = cib.slice(32+x, bsize)
+    #  break
+    #else
+    #  print ','
+    #end
+  end
+  #print '!'
+end
+puts
+pp plain.join
+pp plain.join == @unknown_str
+
