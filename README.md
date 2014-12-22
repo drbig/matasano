@@ -18,8 +18,10 @@ Current status: **fun in progress**
   10. [Implement CBC mode](http://cryptopals.com/sets/2/challenges/10) - **Done**
   11. [An ECB/CBC detection oracle](http://cryptopals.com/sets/2/challenges/11) - **Done**
   12. [Byte-at-a-time ECB decryption (Simple)](http://cryptopals.com/sets/2/challenges/12) - **Done**
-  13. [ECB cut-and-paste](http://cryptopals.com/sets/2/challenges/13) - *Probably done*
-  14. [Byte-at-a-time ECB decryption (Harder)](http://cryptopals.com/sets/2/challenges/14) - WIP
+  13. [ECB cut-and-paste](http://cryptopals.com/sets/2/challenges/13) - **Done**
+  14. [Byte-at-a-time ECB decryption (Harder)](http://cryptopals.com/sets/2/challenges/14) - **Done**
+  15. [PKCS#7 padding validation](http://cryptopals.com/sets/2/challenges/15) - **Done**
+  16. [CBC bitflipping attacks](http://cryptopals.com/sets/2/challenges/16) - **Done**
 
 *All hacking is done in Ruby, in a single file*. I prefer this free-form style where I mix my functions and test snippets, commenting stuff in and out. I plan to separate the functions and test cases into some sane file hierarchy once I feel I'm done with the challenges themselves. I'm even tempted to wrap it all as a test suite or Rakefile.
 
