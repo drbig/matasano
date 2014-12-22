@@ -584,8 +584,8 @@ end
 # 2/16
 # this was much easier than I thought, as it seems one can do multiple 1-bit
 # edits to a block and have it 'edit' the next block!
-require 'uri'
-pp @key = bytes2str(rand_ascii(16))
+#require 'uri'
+#pp @key = bytes2str(rand_ascii(16))
 
 def gen_comment(data)
   src = "comment1=cooking%20MCs;#{URI.encode_www_form({:userdata => data})};comment2=%20like%20a%20pound%20of%20bacon".bytes
@@ -615,8 +615,68 @@ end
 #
 # ';' at 5
 # '=' at 11
-cc = gen_comment('AAAAA1AAAAA2AAAA' + 'aaaaa3admin5true')
-cc[32+5] ^= 8
-cc[32+11] ^= 8
-pp parse_comment(cc)
+#cc = gen_comment('AAAAA1AAAAA2AAAA' + 'aaaaa3admin5true')
+#cc[32+5] ^= 8
+#cc[32+11] ^= 8
+#pp parse_comment(cc)
+
+# 3/17
+#
+# first I want to do a simplified version, just to get the feel of it
+# also for a change i'd like to end up with a general purpose
+# function that can be pointed at something and crack it
+
+pp @key = bytes2str(rand_ascii(16))
+pp @iv = bytes2str(rand_ascii(16))
+
+def penc(str)
+  @cbc.reset
+  @cbc.encrypt
+  @cbc.key = @key
+  @cbc.iv = @iv
+  @cbc.update(str) + @cbc.final
+end
+
+def pdec(str)
+  @cbc.reset
+  @cbc.decrypt
+  @cbc.key = @key
+  @cbc.iv = @iv
+  begin
+    @cbc.update(str)
+    @cbc.final
+    true
+  rescue OpenSSL::Cipher::CipherError
+    false
+  end
+end
+
+pp src = 'YELLOW RUBMARINEYELLOW SUBMARINE'
+pp cip = penc(src)
+#pp pdec(cip)
+pp src.bytes.each_slice(16).to_a.map {|e| bytes2str(e) }
+
+def calc_attack_other(plain, cipher, pos)
+  attack = "\0" * 16
+  pad = 16 - pos
+  14.downto(pos) do |i|
+    attack[i+1] = (pad ^ plain[i+1].ord ^ cipher[i+1].ord).chr
+  end
+  attack
+end
+
+pp blocks = cip.bytes.each_slice(16).to_a.map {|e| bytes2str(e) }
+plain = " " * 16
+attack = "\0" * 16
+15.downto(0) do |x|
+  0.upto(255) do |b|
+    attack[x] = b.chr
+    if pdec(attack + blocks[1])
+      plain[x] = ((16 - x) ^ blocks[0][x].ord ^ attack[x].ord).chr
+      attack = calc_attack_other(plain, blocks[0], x-1)
+      break
+    end
+  end
+  pp plain
+end
 
