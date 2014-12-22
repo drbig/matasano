@@ -359,11 +359,9 @@ end
 require 'base64'
 @unknown_str = Base64.decode64('Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHddXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QYnkK')
 pp @unknown_str.length
-#pp @key = bytes2str(rand_ascii(16))
-pp @key = 'YELLOW SUBMARINE'
+pp @key = bytes2str(rand_ascii(16))
 
 def ecb_enc(input)
-  #pp input.length
   @ecb.reset
   @ecb.encrypt
   @ecb.key = @key
@@ -374,7 +372,7 @@ def ecb_dec(input)
   @ecb.reset
   @ecb.decrypt
   @ecb.key = @key
-  @ecb.update(input)# + @ecb.final
+  @ecb.update(input) + @ecb.final
 end
 
 def oracle_12(input)
@@ -483,33 +481,23 @@ def oracle_12h(input)
   [l, c]
 end
 
-# <scratch>
-#1.upto(32) do |x|
-#  o = oracle_12h('A' * 10)
-#  cip = o.last
-#  pp [x, o[0], cip.length]
-#end
-# </scratch>
-#
 # the only way i see now to get this done is to be able
 # to tell if i'm block-boundary aligned
 #
-# let's say i know the random crap can be 0 - blocksize in length
-# (general: i can figure out the length range of the random crap)
+# assumptions: block length = 16, unknown bytes length = 117,
+#              random crap length range = 0 - 16 (one block)
 # 
-# given that i know that the runs i...
-# scratch
-# let's make it simpler: i know the target-bytes length
-# so i align the target-bytes by one-byte-short
-# now if the random crap is extacly 1 i get a block-shorter ciphertext
-# and the last block is exactly the last full block of unknown bytes
+# with that i align the unknown bytes to 128, add one more block
+# and try until I get 176 bytes back - this should happen only
+# when the random crap is exactly 16 bytes long (128 + 16 + 16 = 160),
+# where the OpenSSL encryption will presumably throw in one more block
+# with nothing by padding. at least this how i understand it.
 last = nil
 while true
   print '.'
-  o = oracle_12h('A' * (11 + 16)) # 128 - 117 - 1 = 10
+  o = oracle_12h('A' * (11 + 16))
   cip = o.last.bytes
   pp [o.first, cip.length]
-  #print cip.length # yeah, i'm stupid
   if cip.length == 176
     puts
     last = cip.slice(-16, 16)
@@ -517,11 +505,8 @@ while true
   end
 end
 pp last
-# so now i know how the cipher looks if the last block of target-bytes
-# is block-aligned. hmm... ok, i need to maintain my alignment
-
-#puts 'NOT YET!'
-#exit
+# now i know that a 176 bytes cipher text which maches the last block
+# is boundary-aligned.
 
 pp bsize = 128 # @unknown_str rounded to block sizes
 plain = Array.new
@@ -529,8 +514,8 @@ plain = Array.new
 1.upto(117) do |x|
   dict = Hash.new
   0.upto(255) do |b|
-    # fugde it so that the last target-bytes are fully within the block-length
-    # if the random-crap len is 1
+    # i repliacte my alignment but add the 128 bytes block for dictionary
+    # generation (176 + 128 = 304)
     src = ('F' * 16) + ('A' * (bsize - x)) + plain.join + b.chr + ('F' * 11)
     while true
       cip = oracle_12h(src).last.bytes
@@ -540,13 +525,13 @@ plain = Array.new
         c = cip.slice(32, bsize)
         dict[c] = b
         break
-      else
-        #print '.'
       end
     end
-    #.bytes.slice(0, bsize)
-    #dict[c] = b
   end
+  # for this part i don't even need to care about the random bytes.
+  # my dict has all possible valid ciphertexts anyway, so I just try
+  # until the random crap is 0 bytes, and the first bsize bytes
+  # of ciphertext are found in the dict
   fsrc = ('A' * (bsize - x))
   cb = nil
   while true
@@ -559,18 +544,11 @@ plain = Array.new
     else
       print ','
     end
-
-    #if cib.slice(-16, 16) == last
-    #  print '+'
-    #  cb = cib.slice(32+x, bsize)
-    #  break
-    #else
-    #  print ','
-    #end
   end
-  #print '!'
 end
 puts
 pp plain.join
 pp plain.join == @unknown_str
 
+# it works, and i know my dict generation is far from the most efficient one
+# but it works and is fast enough (i.e. no time to make tea)
