@@ -626,8 +626,8 @@ end
 # also for a change i'd like to end up with a general purpose
 # function that can be pointed at something and crack it
 
-pp @key = bytes2str(rand_ascii(16))
-pp @iv = bytes2str(rand_ascii(16))
+#pp @key = bytes2str(rand_ascii(16))
+#pp @iv = bytes2str(rand_ascii(16))
 
 def penc(str)
   @cbc.reset
@@ -728,23 +728,35 @@ end
 
 # 3/17 proper, so to say
 # i assume i get the iv. and now i know that normally i wouldn't
+#require 'base64'
+#
+#PLAINS = [
+#  'MDAwMDAwTm93IHRoYXQgdGhlIHBhcnR5IGlzIGp1bXBpbmc=',
+#  'MDAwMDAxV2l0aCB0aGUgYmFzcyBraWNrZWQgaW4gYW5kIHRoZSBWZWdhJ3MgYXJlIHB1bXBpbic=',
+#  'MDAwMDAyUXVpY2sgdG8gdGhlIHBvaW50LCB0byB0aGUgcG9pbnQsIG5vIGZha2luZw==',
+#  'MDAwMDAzQ29va2luZyBNQydzIGxpa2UgYSBwb3VuZCBvZiBiYWNvbg==',
+#  'MDAwMDA0QnVybmluZyAnZW0sIGlmIHlvdSBhaW4ndCBxdWljayBhbmQgbmltYmxl',
+#  'MDAwMDA1SSBnbyBjcmF6eSB3aGVuIEkgaGVhciBhIGN5bWJhbA==',
+#  'MDAwMDA2QW5kIGEgaGlnaCBoYXQgd2l0aCBhIHNvdXBlZCB1cCB0ZW1wbw==',
+#  'MDAwMDA3SSdtIG9uIGEgcm9sbCwgaXQncyB0aW1lIHRvIGdvIHNvbG8=',
+#  'MDAwMDA4b2xsaW4nIGluIG15IGZpdmUgcG9pbnQgb2g=',
+#  'MDAwMDA5aXRoIG15IHJhZy10b3AgZG93biBzbyBteSBoYWlyIGNhbiBibG93'
+#].map {|e| Base64.decode64(e) }
+#
+#pp seli = rand(PLAINS.length)
+#enc = penc(PLAINS[seli])
+#plain = padding_oracle(enc, :iv => @iv.bytes) {|i| pdec(i) }
+#pp [enc.length, plain.length]
+#pp pkcs_check(plain, false) || plain
+
+# lets try the least effort way
+
+@ctr = OpenSSL::Cipher.new('AES-128-CTR')
+
 require 'base64'
+pp cip = Base64.decode64('L77na/nrFsKvynd6HzOoG7GHTLXsTVu9qvY/2syLXzhPweyyMTJULu/6/kXX0KSvoOLSFQ==')
 
-PLAINS = [
-  'MDAwMDAwTm93IHRoYXQgdGhlIHBhcnR5IGlzIGp1bXBpbmc=',
-  'MDAwMDAxV2l0aCB0aGUgYmFzcyBraWNrZWQgaW4gYW5kIHRoZSBWZWdhJ3MgYXJlIHB1bXBpbic=',
-  'MDAwMDAyUXVpY2sgdG8gdGhlIHBvaW50LCB0byB0aGUgcG9pbnQsIG5vIGZha2luZw==',
-  'MDAwMDAzQ29va2luZyBNQydzIGxpa2UgYSBwb3VuZCBvZiBiYWNvbg==',
-  'MDAwMDA0QnVybmluZyAnZW0sIGlmIHlvdSBhaW4ndCBxdWljayBhbmQgbmltYmxl',
-  'MDAwMDA1SSBnbyBjcmF6eSB3aGVuIEkgaGVhciBhIGN5bWJhbA==',
-  'MDAwMDA2QW5kIGEgaGlnaCBoYXQgd2l0aCBhIHNvdXBlZCB1cCB0ZW1wbw==',
-  'MDAwMDA3SSdtIG9uIGEgcm9sbCwgaXQncyB0aW1lIHRvIGdvIHNvbG8=',
-  'MDAwMDA4b2xsaW4nIGluIG15IGZpdmUgcG9pbnQgb2g=',
-  'MDAwMDA5aXRoIG15IHJhZy10b3AgZG93biBzbyBteSBoYWlyIGNhbiBibG93'
-].map {|e| Base64.decode64(e) }
-
-pp seli = rand(PLAINS.length)
-enc = penc(PLAINS[seli])
-plain = padding_oracle(enc, :iv => @iv.bytes) {|i| pdec(i) }
-pp [enc.length, plain.length]
-pp pkcs_check(plain, false) || plain
+@ctr.decrypt
+@ctr.key = 'YELLOW SUBMARINE'
+@ctr.iv = "\0" * 16
+pp(@ctr.update(cip) + @ctr.final)
