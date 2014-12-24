@@ -20,6 +20,6 @@ class String
   end
 
   def to_base64
-    Base64.encode64(self).chop
+    Base64.encode64(self).gsub("\n", '')
   end
 end

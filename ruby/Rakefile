@@ -1,5 +1,15 @@
 require 'rake/testtask'
 
+desc 'Drop to PRY console'
+task :console do
+  $LOAD_PATH.unshift File.join(File.dirname(__FILE__), 'lib')
+
+  require 'cryptopals/all'
+  require 'pry'
+
+  binding.pry
+end
+
 Rake::TestTask.new do |t|
   t.libs = ['lib', 'test']
   t.name = 'test:unit:all'
@@ -13,6 +23,25 @@ FileList['test/unit_*.rb'].each do |p|
     t.libs = ['lib', 'test']
     t.name = "test:unit:#{name}"
     t.warning = true
+    t.test_files = [p]
+  end
+end
+
+Rake::TestTask.new do |t|
+  t.libs = ['lib', 'test']
+  t.name = 'test:challenge:all'
+  t.warning = true
+  t.options = '-v'
+  t.test_files = FileList['test/ch_*.rb']
+end
+
+FileList['test/ch_*.rb'].each do |p|
+  name = p.split('_').last.split('.').first
+  Rake::TestTask.new do |t|
+    t.libs = ['lib', 'test']
+    t.name = "test:challenge:#{name}"
+    t.warning = true
+    t.options = '-v'
     t.test_files = [p]
   end
 end
