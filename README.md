@@ -12,7 +12,7 @@ Current status: **fun in progress**, but maybe I should step back and make my co
   5. [Implement repeating-key XOR](http://cryptopals.com/sets/1/challenges/5) - **Done**
   6. [Break repeating-key XOR](http://cryptopals.com/sets/1/challenges/6) - **Done**
   7. [AES in ECB mode](http://cryptopals.com/sets/1/challenges/7) - **Done**
-  8. [Detect AES in ECB mode](http://cryptopals.com/sets/1/challenges/8) - *Probably done*
+  8. [Detect AES in ECB mode](http://cryptopals.com/sets/1/challenges/8) - **Done**
 - Set 2
   9. [Implement PKCS#7 padding](http://cryptopals.com/sets/2/challenges/9) - **Done**
   10. [Implement CBC mode](http://cryptopals.com/sets/2/challenges/10) - **Done**
@@ -25,9 +25,30 @@ Current status: **fun in progress**, but maybe I should step back and make my co
 - Set 3
   17. [The CBC padding oracle](http://cryptopals.com/sets/3/challenges/17) - **Done**
 
-*All hacking is done in Ruby, in a single file*. I prefer this free-form style where I mix my functions and test snippets, commenting stuff in and out. I plan to separate the functions and test cases into some sane file hierarchy once I feel I'm done with the challenges themselves. I'm even tempted to wrap it all as a test suite or Rakefile.
+~~*All hacking is done in Ruby, in a single file*. I prefer this free-form style where I mix my functions and test snippets, commenting stuff in and out. I plan to separate the functions and test cases into some sane file hierarchy once I feel I'm done with the challenges themselves. I'm even tempted to wrap it all as a test suite or Rakefile.~~
 
 All of the code here is 100% genuine own code, done by me. No looksees, copy & paste etc. I might have looked up the theory of some topics in proper literature though (you should too, probably).
+
+Currently Set 1 is done 'properly' in Ruby:
+
+    $ cd ruby && rake test:challenge:all
+    
+    # Running:
+    
+    TestChallenge1#test_ch_1 = 0.00 s = .
+    TestChallenge2#test_ch_2 = 0.00 s = .
+    TestChallenge3#test_ch_3 = 0.00 s = .
+    TestChallenge4#test_ch_4 = 1.58 s = .
+    TestChallenge5#test_ch_5 = 0.00 s = .
+    TestChallenge6#test_ch_6 = 0.39 s = .
+    TestChallenge7#test_ch_7 = 0.00 s = .
+    TestChallenge8#test_ch_8 = 0.03 s = .
+    
+    Finished in 2.001272s, 3.9975 runs/s, 4.9968 assertions/s.
+    
+    8 runs, 10 assertions, 0 failures, 0 errors, 0 skips
+
+There are also unit tests for the library (`rake test:unit:all`, but note that some are non-deterministic where a failure doesn't necessarily mean the code is wrong).
 
 ### Thoughts and notes
 
