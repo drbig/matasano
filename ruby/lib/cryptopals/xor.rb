@@ -81,9 +81,6 @@ class String
   end
 
   def xor_break_mod(opts = {})
-    n = opts[:n] || 3
-    lang = opts[:lang] || :en
-    model = opts[:model] || Cryptopals::MODELS[lang]
     kls = opts[:keylengths] || xor_guess_keylen(4, 40, opts)
 
     kls.map do |(_, kl)|

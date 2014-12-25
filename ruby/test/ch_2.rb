@@ -5,7 +5,7 @@ require 'minitest/autorun'
 require 'cryptopals/conv'
 require 'cryptopals/xor'
 
-class TestChallenge < Minitest::Test
+class TestChallenge2 < Minitest::Test
   def test_ch_2
     assert_equal '746865206b696420646f6e277420706c6179', \
                  '1c0111001f010100061a024b53535009181c'.from_hex\

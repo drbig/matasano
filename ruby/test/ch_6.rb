@@ -5,9 +5,9 @@ require 'minitest/autorun'
 require 'cryptopals/conv'
 require 'cryptopals/xor'
 
-DATA_FILE = File.join(File.dirname(__FILE__), '..', '..', 'data', '1-6.txt')
+class TestChallenge6 < Minitest::Test
+  DATA_FILE = File.join(File.dirname(__FILE__), '..', '..', 'data', '1-6.txt')
 
-class TestChallenge < Minitest::Test
   def setup
     @data = String.new
     File.open(DATA_FILE, 'r') do |f|
