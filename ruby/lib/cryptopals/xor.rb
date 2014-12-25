@@ -79,4 +79,27 @@ class String
     end
     keys.sort! {|(a, _), (b, _)| b <=> a }.slice(0, n)
   end
+
+  def xor_break_mod(opts = {})
+    n = opts[:n] || 3
+    lang = opts[:lang] || :en
+    model = opts[:model] || Cryptopals::MODELS[lang]
+    kls = opts[:keylengths] || xor_guess_keylen(4, 40, opts)
+
+    kls.map do |(_, kl)|
+      blocks = bytes.each_slice(kl).to_a.map do |a|
+        a.length < kl ? a += ([-1] * (kl - a.length)) : a
+      end.transpose.map do |a|
+        a.reject {|e| e < 0 }.map(&:chr).join
+      end
+      keys = Array.new
+      blocks.each do |b|
+        keys.push(b.xor_break_byte(opts))
+      end
+      [kl, keys]
+    end.map do |(kl, gs)|
+      gs = gs.map {|a| a.map {|b| b.last.chr } }.transpose.map {|a| a.join }
+      [kl, gs]
+    end
+  end
 end

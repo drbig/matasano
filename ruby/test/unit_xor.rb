@@ -23,6 +23,11 @@ class TestXOR < Minitest::Test
     end.join
   end
 
+  # random ascii
+  def gen_ascii(length)
+    1.upto(length).map { (32 + rand(95)).chr }.join
+  end
+
   def test_xor_with_byte
     assert_equal "xde\x7F,e\x7F,m,xi\x7Fx", 'this is a test'.xor_with(12)
     assert_equal 'this is a test', "xde\x7F,e\x7F,m,xi\x7Fx".xor_with(12)
@@ -66,9 +71,9 @@ class TestXOR < Minitest::Test
 
   def test_xor_guess_keylen
     [
-      [512,  ['short key', 'who knows what', 'a much longer key for fun']],
+      [512,  ['short key sdsf', 'who knows what', 'a much longer key for fun']],
       [1024, ['no short keys?', '%sgj3*923jd0-2', 'H*(hdlk3h8(&Goidh389)(()u']],
-      [2048, ['!@#$%^123', 'abcdef a test', 'completely not random']]
+      [2048, ['!@#$%^123 werwe', 'abcdef a test', 'completely not random']]
     ].each do |(s, ks)|
       p = gen_string(s)
       ks.each do |k|
@@ -76,6 +81,15 @@ class TestXOR < Minitest::Test
         c = p.xor_with(k, true)
         assert_includes c.xor_guess_keylen(4, 32).map(&:last), l
       end
+    end
+  end
+
+  def test_xor_break_mod
+    p = gen_string(4096)
+    [21, 25, 31].each do |kl|
+      k = gen_ascii(kl)
+      c = p.xor_with(k, true)
+      assert_equal [[kl, [k]]], c.xor_break_mod(:n => 1)
     end
   end
 end
