@@ -5,9 +5,9 @@ require 'minitest/autorun'
 require 'cryptopals/conv'
 require 'openssl'
 
-DATA_FILE = File.join(File.dirname(__FILE__), '..', '..', 'data', '1-7.txt')
-
 class TestChallenge7 < Minitest::Test
+  DATA_FILE = File.join(File.dirname(__FILE__), '..', '..', 'data', '1-7.txt')
+
   def setup
     @data = String.new
     File.open(DATA_FILE, 'r') do |f|
