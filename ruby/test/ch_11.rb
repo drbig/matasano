@@ -19,14 +19,14 @@ class TestChallenge11 < Minitest::Test
     [128, 256].each do |s|
       @cb.set_cipher(OpenSSL::Cipher::AES, s, :ECB)
       1.upto(16) do
-        assert @cb.check_if_ecb(nil, s) {|i| gen_crap(i) }
+        assert @cb.ecb_detect(nil, s) {|i| gen_crap(i) }
       end
     end
 
     [128, 256].each do |s|
       @cb.set_cipher(OpenSSL::Cipher::AES, s, :CBC)
       1.upto(16) do
-        assert_equal false, @cb.check_if_ecb(nil, s) {|i| gen_crap(i) }
+        assert_equal false, @cb.ecb_detect(nil, s) {|i| gen_crap(i) }
       end
     end
   end

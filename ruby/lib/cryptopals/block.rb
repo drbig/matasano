@@ -89,7 +89,7 @@ module Cryptopals
       do_cipher(data, :decrypt, opts)
     end
 
-    def self.check_if_ecb(data, size, opts = {}, &oracle)
+    def self.ecb_detect(data, size, opts = {}, &oracle)
       raise BlockError, 'bad block size' if size % 8 != 0
 
       bs = size / 8
@@ -146,6 +146,6 @@ class String
   end
 
   def is_ecb?(size = 16, opts = {})
-    Cryptopals::Block.check_if_ecb(self, size, opts)
+    Cryptopals::Block.ecb_detect(self, size, opts)
   end
 end
