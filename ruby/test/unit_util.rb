@@ -16,4 +16,11 @@ class TestConv < Minitest::Test
   def test_dist_hamming_error
     assert_raises(Cryptopals::Error) { '123'.dist_hamming('1') }
   end
+
+  def test_to_slices
+    assert_equal ['ab', 'cd', 'e'],         'abcde'.to_slices(2)
+    assert_equal ["\x01\x02", "\x03\x04"],  "\x01\x02\x03\x04".to_slices(2)
+    assert_equal ['abc'],                   'abc'.to_slices(4)
+    assert_equal ['abcd', 'efgh'],          'abcdefgh'.to_slices(4)
+  end
 end
