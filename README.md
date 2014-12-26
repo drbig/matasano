@@ -32,23 +32,29 @@ All of the code here is 100% genuine own code, done by me. No looksees, copy & p
 Currently Set 1 is done 'properly' in Ruby:
 
     $ cd ruby && rake test:challenge:all
+    Run options: -v --seed 1117
     
     # Running:
     
-    TestChallenge1#test_ch_1 = 0.00 s = .
-    TestChallenge2#test_ch_2 = 0.00 s = .
-    TestChallenge3#test_ch_3 = 0.00 s = .
-    TestChallenge4#test_ch_4 = 1.58 s = .
-    TestChallenge5#test_ch_5 = 0.00 s = .
-    TestChallenge6#test_ch_6 = 0.39 s = .
-    TestChallenge7#test_ch_7 = 0.00 s = .
-    TestChallenge8#test_ch_8 = 0.03 s = .
+    TestChallenge01#test_ch_01 = 0.00 s = .
+    TestChallenge02#test_ch_02 = 0.00 s = .
+    TestChallenge03#test_ch_03 = 0.01 s = .
+    TestChallenge04#test_ch_04 = 1.56 s = .
+    TestChallenge05#test_ch_05 = 0.00 s = .
+    TestChallenge06#test_ch_06 = 0.39 s = .
+    TestChallenge07#test_ch_07 = 0.00 s = .
+    TestChallenge08#test_ch_08 = 0.13 s = .
+    TestChallenge09#test_ch_09 = 0.00 s = .
+    TestChallenge10#test_ch_10 = 0.01 s = .
+    TestChallenge11#test_ch_11 = 0.00 s = .
     
-    Finished in 2.001272s, 3.9975 runs/s, 4.9968 assertions/s.
+    Finished in 2.099191s, 5.2401 runs/s, 39.0627 assertions/s.
     
-    8 runs, 10 assertions, 0 failures, 0 errors, 0 skips
+    11 runs, 82 assertions, 0 failures, 0 errors, 0 skips
 
 There are also unit tests for the library (`rake test:unit:all`, but note that some are non-deterministic where a failure doesn't necessarily mean the code is wrong).
+
+The general idea is to have the unit tests not depend on the challenges data inputs. This might not be exactly the case for now. (I've also noted that my `assert_equal` are backwards, oh well, conventions...)
 
 ### Thoughts and notes
 
