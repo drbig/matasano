@@ -51,7 +51,7 @@ module Cryptopals
       if @cipher_params[:mode] != :ECB
         iv = case iv
         when :random
-          @cipher.iv_random
+          @cipher.random_iv
         when :null
           @cipher.iv = "\0" * bs
         else
