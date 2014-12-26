@@ -5,10 +5,10 @@ require 'minitest/autorun'
 require 'cryptopals/conv'
 require 'cryptopals/xor'
 
-class TestChallenge4 < Minitest::Test
+class TestChallenge04 < Minitest::Test
   DATA_FILE = File.join(File.dirname(__FILE__), '..', '..', 'data', '1-4.txt')
 
-  def test_ch_4
+  def test_ch_04
     found = Array.new
     File.open(DATA_FILE, 'r') do |f|
       f.each_line.with_index do |l, i|

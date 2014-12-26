@@ -5,7 +5,7 @@ require 'minitest/autorun'
 require 'cryptopals/conv'
 require 'cryptopals/xor'
 
-class TestChallenge6 < Minitest::Test
+class TestChallenge06 < Minitest::Test
   DATA_FILE = File.join(File.dirname(__FILE__), '..', '..', 'data', '1-6.txt')
 
   def setup
@@ -15,7 +15,7 @@ class TestChallenge6 < Minitest::Test
     end
   end
 
-  def test_ch_6
+  def test_ch_06
     assert_equal [[29, ["Terminator X: Bring the noise"]]],
                  @data.xor_break_mod(:n => 1)
   end

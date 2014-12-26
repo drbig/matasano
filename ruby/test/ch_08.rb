@@ -5,7 +5,7 @@ require 'minitest/autorun'
 require 'cryptopals/conv'
 require 'cryptopals/block'
 
-class TestChallenge8 < Minitest::Test
+class TestChallenge08 < Minitest::Test
   DATA_FILE = File.join(File.dirname(__FILE__), '..', '..', 'data', '1-8.txt')
 
   def setup
@@ -15,7 +15,7 @@ class TestChallenge8 < Minitest::Test
     end
   end
 
-  def test_ch_8
+  def test_ch_08
     # first raw version
     #s = @data.map.with_index do |e, i|
     #  [e.bytes.each_slice(16).map {|b| b.pack('c*') }.combination(2)\

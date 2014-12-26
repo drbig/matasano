@@ -5,7 +5,7 @@ require 'minitest/autorun'
 require 'cryptopals/conv'
 require 'openssl'
 
-class TestChallenge7 < Minitest::Test
+class TestChallenge07 < Minitest::Test
   DATA_FILE = File.join(File.dirname(__FILE__), '..', '..', 'data', '1-7.txt')
 
   def setup
@@ -16,7 +16,7 @@ class TestChallenge7 < Minitest::Test
     @dec = OpenSSL::Cipher.new('AES-128-ECB')
   end
 
-  def test_ch_7
+  def test_ch_07
     @dec.reset
     @dec.key = 'YELLOW SUBMARINE'
     p = @dec.update(@data) + @dec.final
