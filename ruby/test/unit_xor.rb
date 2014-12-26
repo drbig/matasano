@@ -3,6 +3,7 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'minitest/autorun'
 require 'cryptopals/xor'
+require 'cryptopals/util'
 
 class TestXOR < Minitest::Test
   def setup
@@ -11,21 +12,6 @@ class TestXOR < Minitest::Test
     model = Cryptopals::MODELS[:en]
     sum = 0
     @model = Hash[model.keys.zip(model.values.map {|x| sum += x })]
-  end
-
-  # generate a string from @model
-  def gen_string(length)
-    1.upto(length).map do
-      r = 100.0 * rand
-      @model.each_pair do |b, p|
-        break b if p >= r
-      end
-    end.join
-  end
-
-  # random ascii
-  def gen_ascii(length)
-    1.upto(length).map { (32 + rand(95)).chr }.join
   end
 
   def test_xor_with_byte
@@ -75,7 +61,7 @@ class TestXOR < Minitest::Test
       [1024, ['no short keys?', '%sgj3*923jd0-2', 'H*(hdlk3h8(&Goidh389)(()u']],
       [2048, ['!@#$%^123 werwe', 'abcdef a test', 'completely not random']]
     ].each do |(s, ks)|
-      p = gen_string(s)
+      p = Cryptopals.random_model(s, @model)
       ks.each do |k|
         l = k.length
         c = p.xor_with(k, true)
@@ -85,9 +71,9 @@ class TestXOR < Minitest::Test
   end
 
   def test_xor_break_mod
-    p = gen_string(4096)
+    p = Cryptopals.random_model(4096, @model)
     [21, 25, 31].each do |kl|
-      k = gen_ascii(kl)
+      k = Cryptopals.random_ascii(kl)
       c = p.xor_with(k, true)
       assert_equal [[kl, [k]]], c.xor_break_mod(:n => 1)
     end
