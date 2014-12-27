@@ -3,12 +3,13 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'minitest/autorun'
 require 'cryptopals/block'
+require 'cryptopals/util'
 require 'uri'
 
 class TestChallenge13 < Minitest::Test
   def setup
     @cb = Cryptopals::Block
-    @cb.set_cipher(OpenSSL::Cipher::AES, 128, :ECB)
+    @cb.set_cipher(OpenSSL::Cipher::AES, 128, :ECB, :key => Cryptopals.random_ascii(16))
   end
 
   def profile_for(email)
