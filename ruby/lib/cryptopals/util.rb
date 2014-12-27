@@ -22,6 +22,11 @@ module Cryptopals
       end
     end.join
   end
+
+  def self.block_align(num, size)
+    bs = size / 8
+    num + (bs - (num % bs))
+  end
 end
 
 class String
@@ -32,12 +37,12 @@ class String
   def dist_hamming(other)
     raise Cryptopals::Error, 'length mismatch' if length != other.length
     bytes.zip(other.bytes).inject(0) do |d, (x, y)|
-       v = x ^ y
-       while v > 0
-         v &= v - 1
-         d += 1
-       end
-       d
+      v = x ^ y
+      while v > 0
+        v &= v - 1
+        d += 1
+      end
+      d
     end
   end
 end

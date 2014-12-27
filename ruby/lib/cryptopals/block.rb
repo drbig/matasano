@@ -117,6 +117,61 @@ module Cryptopals
         false
       end
     end
+
+    def self.ecb_blocksize(opts = {}, &oracle)
+      raise BlockError, 'no oracle given' unless oracle
+
+      runs = opts[:runs] || 10
+      min = 2 ** 32
+      max = 0
+      1.upto(runs) do
+        l = oracle.call('').length
+        min = [min, l].min
+        max = [max, l].max
+      end
+
+      bs = nil
+      i = 1
+      while true
+        l = oracle.call('A' * i).length
+        if l > max
+          bs = (l - max) * 8 
+          break
+        end
+        i += 1
+      end
+
+      if opts[:debug]
+        [bs, min, max]
+      else
+        bs
+      end
+    end
+
+    def self.ecb_reveal(len, offset, size, opts = {}, &oracle)
+      raise BlockError, 'no oracle given' unless oracle
+
+      bs = size / 8
+      bufs = Cryptopals.block_align(len, size)
+      fs = Cryptopals.block_align(offset, size)
+      bp = fs + bufs - bs
+      fudge = 'F' * (fs - offset)
+      plain = Array.new
+
+      1.upto(len) do |p|
+        dict = Hash.new
+        0.upto(255) do |b|
+          src = fudge + ('A' * (bufs - p)) + plain.join + b.chr
+          cb = oracle.call(src).slice(bp, bs)
+          dict[cb] = b.chr
+        end
+
+        cb = oracle.call(fudge + ('A' * (bufs - p))).slice(bp, bs)
+        plain.push(dict[cb])
+      end
+
+      plain.join
+    end
   end
 end
 
