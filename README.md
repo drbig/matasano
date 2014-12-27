@@ -2,7 +2,7 @@
 
 Sharing my progress and solutions to the [the matasano crypto challenges](http://cryptopals.com/). Obviously, this is one big **spoiler**. You have been warned.
 
-Current status: **fun in progress**, but maybe I should step back and make my code sane?
+Current status: **fun in progress**, at [Set 3](http://cryptopals.com/sets/3/)
 
 - Set 1
   1. [Convert hex to base64](http://cryptopals.com/sets/1/challenges/1) - **Done**
@@ -24,6 +24,9 @@ Current status: **fun in progress**, but maybe I should step back and make my co
   16. [CBC bitflipping attacks](http://cryptopals.com/sets/2/challenges/16) - **Done**
 - Set 3
   17. [The CBC padding oracle](http://cryptopals.com/sets/3/challenges/17) - **Done**
+  18. [Implement CTR, the stream cipher mode](http://cryptopals.com/sets/3/challenges/18) - **Done**
+  19. [Break fixed-nonce CTR mode using substitutions](http://cryptopals.com/sets/3/challenges/19) - Skipped (for now)
+  20. [Break fixed-nonce CTR statistically](http://cryptopals.com/sets/3/challenges/20) - **Done**
 
 ~~*All hacking is done in Ruby, in a single file*. I prefer this free-form style where I mix my functions and test snippets, commenting stuff in and out. I plan to separate the functions and test cases into some sane file hierarchy once I feel I'm done with the challenges themselves. I'm even tempted to wrap it all as a test suite or Rakefile.~~
 
