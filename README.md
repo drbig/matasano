@@ -29,32 +29,37 @@ Current status: **fun in progress**, but maybe I should step back and make my co
 
 All of the code here is 100% genuine own code, done by me. No looksees, copy & paste etc. I might have looked up the theory of some topics in proper literature though (you should too, probably).
 
-Currently Set 1 is done 'properly' in Ruby:
+Currently Sets 1 - 2 are done 'properly' in Ruby:
 
     $ cd ruby && rake test:challenge:all
-    Run options: -v --seed 1117
+    Run options: -v --seed 17746
     
     # Running:
     
     TestChallenge01#test_ch_01 = 0.00 s = .
     TestChallenge02#test_ch_02 = 0.00 s = .
     TestChallenge03#test_ch_03 = 0.01 s = .
-    TestChallenge04#test_ch_04 = 1.56 s = .
+    TestChallenge04#test_ch_04 = 1.57 s = .
     TestChallenge05#test_ch_05 = 0.00 s = .
-    TestChallenge06#test_ch_06 = 0.39 s = .
+    TestChallenge06#test_ch_06 = 0.40 s = .
     TestChallenge07#test_ch_07 = 0.00 s = .
     TestChallenge08#test_ch_08 = 0.13 s = .
     TestChallenge09#test_ch_09 = 0.00 s = .
     TestChallenge10#test_ch_10 = 0.01 s = .
     TestChallenge11#test_ch_11 = 0.00 s = .
+    TestChallenge12#test_ch_12 = 0.37 s = .
+    TestChallenge13#test_ch_13 = 0.00 s = .
+    TestChallenge14#test_ch_14 = 4.60 s = .
+    TestChallenge15#test_ch_15 = 0.00 s = .
+    TestChallenge16#test_ch_16 = 0.00 s = .
     
-    Finished in 2.099191s, 5.2401 runs/s, 39.0627 assertions/s.
+    Finished in 7.102223s, 2.2528 runs/s, 14.7841 assertions/s.
     
-    11 runs, 82 assertions, 0 failures, 0 errors, 0 skips
+    16 runs, 105 assertions, 0 failures, 0 errors, 0 skips
 
 There are also unit tests for the library (`rake test:unit:all`, but note that some are non-deterministic where a failure doesn't necessarily mean the code is wrong).
 
-The general idea is to have the unit tests not depend on the challenges data inputs. This might not be exactly the case for now. (I've also noted that my `assert_equal` are backwards, oh well, conventions...)
+The general idea is to have the unit tests not depend on the challenges data inputs. This might not be exactly the case for now. (I've also noted that some of my `assert_equal`s are backwards, oh well, conventions...)
 
 ### Thoughts and notes
 
