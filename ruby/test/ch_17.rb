@@ -6,8 +6,6 @@ require 'cryptopals/block'
 require 'cryptopals/conv'
 require 'cryptopals/util'
 
-require 'pp'
-
 class TestChallenge17 < Minitest::Test
   def setup
     @cb = Cryptopals::Block
