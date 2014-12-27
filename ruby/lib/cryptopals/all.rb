@@ -1,4 +1,5 @@
 require 'cryptopals/conv'
-require 'cryptopals/xor'
 require 'cryptopals/block'
+require 'cryptopals/stream'
 require 'cryptopals/util'
+require 'cryptopals/xor'
