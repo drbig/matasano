@@ -35,6 +35,9 @@ class TestChallenge16 < Minitest::Test
     assert_equal false, is_admin?(comment_parse(comment_for('admin=true;admin=true')))
     assert_equal false, is_admin?(comment_parse(comment_for('%3badmin%3dtrue%3b')))
 
+    assert_includes Cryptopals.bytes_with_dist(';', 1, true), '3'
+    assert_includes Cryptopals.bytes_with_dist('=', 1, true), '5'
+
     c = comment_for('AAAAA1AAAAA2AAAA' + 'aaaaa3admin5true').encrypt
     c[32 + 5]  = (c[32 + 5].ord  ^ 8).chr
     c[32 + 11] = (c[32 + 11].ord ^ 8).chr

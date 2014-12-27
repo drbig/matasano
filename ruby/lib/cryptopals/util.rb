@@ -27,6 +27,18 @@ module Cryptopals
     bs = size / 8
     num + (bs - (num % bs))
   end
+
+  def self.bytes_with_dist(from, dist, ascii = false)
+    if ascii
+      min = 32
+      max = 126
+    else
+      min = 0
+      max = 255
+    end
+
+    min.upto(max).map {|b| from.dist_hamming(b.chr) == dist ? b.chr : nil }.compact
+  end
 end
 
 class String
