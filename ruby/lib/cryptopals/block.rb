@@ -151,23 +151,32 @@ module Cryptopals
     def self.ecb_reveal(len, offset, size, opts = {}, &oracle)
       raise BlockError, 'no oracle given' unless oracle
 
-      bs = size / 8
-      bufs = Cryptopals.block_align(len, size)
-      fs = Cryptopals.block_align(offset, size)
-      bp = fs + bufs - bs
-      fudge = 'F' * (fs - offset)
+      bs = size / 8                             # block size (all in bytes)
+      fs = Cryptopals.block_align(offset, size) # pre-fudge block length
+      bufs = Cryptopals.block_align(len, size)  # cracking buffer length
+      prfu = 'F' * ((fs - offset) + bs)         # pre-fudge string (align cracking buffer)
+      pofu = 'F' * (bufs - len)                 # post-fudge string (align target string)
+      glen = fs + (2 * bs) + (2 * bufs)         # good length (all alligned, max ciphertext length)
+      bp = fs + bufs                            # position of cracking block
       plain = Array.new
 
       1.upto(len) do |p|
         dict = Hash.new
         0.upto(255) do |b|
-          src = fudge + ('A' * (bufs - p)) + plain.join + b.chr
-          cb = oracle.call(src).slice(bp, bs)
-          dict[cb] = b.chr
+          src = prfu + ('A' * (bufs - p)) + plain.join + b.chr + pofu
+          while c = oracle.call(src)
+            next unless c.length == glen
+            dict[c.slice(bp, bs)] = b.chr
+            break
+          end
         end
 
-        cb = oracle.call(fudge + ('A' * (bufs - p))).slice(bp, bs)
-        plain.push(dict[cb])
+        src = prfu + ('A' * (bufs - p))
+        while cb = oracle.call(src).slice(bp, bs)
+          next unless dict.has_key? cb
+          plain.push(dict[cb])
+          break
+        end
       end
 
       plain.join

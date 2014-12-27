@@ -14,13 +14,14 @@ class TestChallenge14 < Minitest::Test
   end
 
   def gen_crap(input)
-    p = Cryptopals.random_bytes(6) + input + @target
+    s = 5 + rand(12)
+    p = Cryptopals.random_bytes(s) + input + @target
     p.encrypt
   end
 
   def test_ch_14
-    assert_equal 128, @cb.ecb_blocksize(:runs => 1) {|i| gen_crap(i) }
+    assert_equal 128, @cb.ecb_blocksize {|i| gen_crap(i) }
     assert @cb.ecb_detect(nil, 128) {|i| gen_crap(i) }
-    assert_equal "Rollin' in my 5.0\nWith my rag-top down so my hair can blow\nThe girlies on standby waving just to say hi\nDid you stop?", @cb.ecb_reveal(117, 6, 128) {|i| gen_crap(i) }
+    assert_equal "Rollin' in my 5.0\nWith my rag-top down so my hair can blow\nThe girlies on standby waving just to say hi\nDid you stop? No, I just drove by\n", @cb.ecb_reveal(138, 16, 128) {|i| gen_crap(i) }
   end
 end

@@ -21,6 +21,6 @@ class TestChallenge12 < Minitest::Test
   def test_ch_12
     assert_equal 128, @cb.ecb_blocksize(:runs => 1) {|i| gen_crap(i) }
     assert @cb.ecb_detect(nil, 128) {|i| gen_crap(i) }
-    assert_equal "Rollin' in my 5.0\nWith my rag-top down so my hair can blow\nThe girlies on standby waving just to say hi\nDid you stop?", @cb.ecb_reveal(117, 0, 128) {|i| gen_crap(i) }
+    assert_equal "Rollin' in my 5.0\nWith my rag-top down so my hair can blow\nThe girlies on standby waving just to say hi\nDid you stop? No, I just drove by\n", @cb.ecb_reveal(138, 0, 128) {|i| gen_crap(i) }
   end
 end
