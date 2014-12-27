@@ -1,4 +1,3 @@
-require 'base64'
 require 'cryptopals'
 
 module Cryptopals
