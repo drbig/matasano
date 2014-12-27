@@ -40,23 +40,23 @@ module Cryptopals
       bs = @cipher_params[:size] / 8
 
       key = case key
-      when :random
-        @cipher.random_key
-      when :null
-        @cipher.key = "\0" * bs
-      else
-        @cipher.key = key
-      end
+            when :random
+              @cipher.random_key
+            when :null
+              @cipher.key = "\0" * bs
+            else
+              @cipher.key = key
+            end
 
       if @cipher_params[:mode] != :ECB
         iv = case iv
-        when :random
-          @cipher.random_iv
-        when :null
-          @cipher.iv = "\0" * bs
-        else
-          @cipher.iv = iv
-        end
+             when :random
+               @cipher.random_iv
+             when :null
+               @cipher.iv = "\0" * bs
+             else
+               @cipher.iv = iv
+             end
       end
 
       [key, iv]
@@ -72,7 +72,7 @@ module Cryptopals
 
       c = @cipher.update(data)
       c += @cipher.final unless opts[:raw]
-      
+
       if opts[:debug]
         [c] + p
       else
@@ -135,7 +135,7 @@ module Cryptopals
       while true
         l = oracle.call('A' * i).length
         if l > max
-          bs = (l - max) * 8 
+          bs = (l - max) * 8
           break
         end
         i += 1
@@ -180,6 +180,44 @@ module Cryptopals
       end
 
       plain.join
+    end
+
+    def self.cbc_padding_vector(plain, cipher, pos, bs)
+      a = "\0" * bs
+      p = bs - pos
+      (bs - 2).downto(pos) do |i|
+        a[i + 1] = (p ^ plain[i + 1].ord ^ cipher[i + 1].ord).chr
+      end
+      a
+    end
+    private_class_method :cbc_padding_vector
+
+    def self.cbc_padding(data, size, opts = {}, &oracle)
+      raise BlockError, 'no oracle given' unless oracle
+
+      bs = size / 8
+      iv = opts[:iv] || ("\0" * bs)
+      cbs = [iv] + data.to_slices(bs)
+      plains = Array.new
+
+      (cbs.length - 1).downto(1) do |i|
+        p = ' ' * bs
+        a = "\0" * bs
+        pb = cbs[i - 1]
+        (bs - 1).downto(0) do |j|
+          0.upto(255) do |b|
+            a[j] = b.chr
+            if oracle.call(a + cbs[i])
+              p[j] = ((bs - j) ^ pb[j].ord ^ a[j].ord).chr
+              a = cbc_padding_vector(p, pb, j - 1, bs)
+              break
+            end
+          end
+        end
+        plains.unshift(p.dup)
+      end
+
+      plains.join
     end
   end
 end
