@@ -38,6 +38,23 @@ module Cryptopals
         loop do yield random end
       end
 
+      def clone(&source)
+        raise RNGError, 'no source given' unless source
+
+        @index = 0
+        0.upto(623) do |i|
+          y = source.call
+
+          y ^= y >> 18
+          y ^= ((y << 15) & 4022730752)
+          n = y
+          5.times { n = y ^ ((n << 7) & 2636928640) }
+          y = n
+          2.times { n = y ^ (n >> 11) }
+          @state[i] = n
+        end
+      end
+
       private
       def generate
         0.upto(623) do |i|
