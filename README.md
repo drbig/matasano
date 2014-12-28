@@ -27,6 +27,10 @@ Current status: **fun in progress**, at [Set 3](http://cryptopals.com/sets/3/)
   18. [Implement CTR, the stream cipher mode](http://cryptopals.com/sets/3/challenges/18) - **Done**
   19. [Break fixed-nonce CTR mode using substitutions](http://cryptopals.com/sets/3/challenges/19) - Skipped (for now)
   20. [Break fixed-nonce CTR statistically](http://cryptopals.com/sets/3/challenges/20) - **Done**
+  21. [Implement the MT19937 Mersenne Twister RNG](http://cryptopals.com/sets/3/challenges/21) - **Done**
+  22. [Crack an MT19937 seed](http://cryptopals.com/sets/3/challenges/22) - **Done**
+  23. [Clone an MT19937 RNG from its output](http://cryptopals.com/sets/3/challenges/23) - **Done**
+  24. [Create the MT19937 stream cipher and break it](http://cryptopals.com/sets/3/challenges/24) - In progress
 
 ~~*All hacking is done in Ruby, in a single file*. I prefer this free-form style where I mix my functions and test snippets, commenting stuff in and out. I plan to separate the functions and test cases into some sane file hierarchy once I feel I'm done with the challenges themselves. I'm even tempted to wrap it all as a test suite or Rakefile.~~
 
