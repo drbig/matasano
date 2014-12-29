@@ -2,7 +2,7 @@
 
 Sharing my progress and solutions to the [the matasano crypto challenges](http://cryptopals.com/). Obviously, this is one big **spoiler**. You have been warned.
 
-Current status: **fun in progress**, at [Set 3](http://cryptopals.com/sets/3/)
+Current status: **fun in progress**, at [Set 4](http://cryptopals.com/sets/4/)
 
 - Set 1
   1. [Convert hex to base64](http://cryptopals.com/sets/1/challenges/1) - **Done**
@@ -30,25 +30,27 @@ Current status: **fun in progress**, at [Set 3](http://cryptopals.com/sets/3/)
   21. [Implement the MT19937 Mersenne Twister RNG](http://cryptopals.com/sets/3/challenges/21) - **Done**
   22. [Crack an MT19937 seed](http://cryptopals.com/sets/3/challenges/22) - **Done**
   23. [Clone an MT19937 RNG from its output](http://cryptopals.com/sets/3/challenges/23) - **Done**
-  24. [Create the MT19937 stream cipher and break it](http://cryptopals.com/sets/3/challenges/24) - In progress
+  24. [Create the MT19937 stream cipher and break it](http://cryptopals.com/sets/3/challenges/24) - **Done**
+- Set 4
+  25. [Break "random access read/write" AES CTR](http://cryptopals.com/sets/4/challenges/25) - In progress
 
 ~~*All hacking is done in Ruby, in a single file*. I prefer this free-form style where I mix my functions and test snippets, commenting stuff in and out. I plan to separate the functions and test cases into some sane file hierarchy once I feel I'm done with the challenges themselves. I'm even tempted to wrap it all as a test suite or Rakefile.~~
 
 All of the code here is 100% genuine own code, done by me. No looksees, copy & paste etc. I might have looked up the theory of some topics in proper literature though (you should too, probably).
 
-Currently Sets 1 - 2 are done 'properly' in Ruby:
+Currently Sets 1 - 3 are done 'properly' in Ruby:
 
     $ cd ruby && rake test:challenge:all
-    Run options: -v --seed 17746
+    Run options: -v --seed 30554
     
     # Running:
     
     TestChallenge01#test_ch_01 = 0.00 s = .
     TestChallenge02#test_ch_02 = 0.00 s = .
     TestChallenge03#test_ch_03 = 0.01 s = .
-    TestChallenge04#test_ch_04 = 1.57 s = .
+    TestChallenge04#test_ch_04 = 1.62 s = .
     TestChallenge05#test_ch_05 = 0.00 s = .
-    TestChallenge06#test_ch_06 = 0.40 s = .
+    TestChallenge06#test_ch_06 = 0.41 s = .
     TestChallenge07#test_ch_07 = 0.00 s = .
     TestChallenge08#test_ch_08 = 0.13 s = .
     TestChallenge09#test_ch_09 = 0.00 s = .
@@ -59,10 +61,16 @@ Currently Sets 1 - 2 are done 'properly' in Ruby:
     TestChallenge14#test_ch_14 = 4.60 s = .
     TestChallenge15#test_ch_15 = 0.00 s = .
     TestChallenge16#test_ch_16 = 0.00 s = .
+    TestChallenge17#test_ch_17 = 0.44 s = .
+    TestChallenge18#test_ch_18 = 0.00 s = .
+    TestChallenge20#test_ch_20 = 0.45 s = .
+    TestChallenge22#test_ch_22 = 0.80 s = .
+    TestChallenge23#test_ch_23 = 0.01 s = .
+    TestChallenge24#test_ch_24 = 5.60 s = .
     
-    Finished in 7.102223s, 2.2528 runs/s, 14.7841 assertions/s.
+    Finished in 14.445771s, 1.5229 runs/s, 21.0442 assertions/s.
     
-    16 runs, 105 assertions, 0 failures, 0 errors, 0 skips
+    22 runs, 304 assertions, 0 failures, 0 errors, 0 skips
 
 There are also unit tests for the library (`rake test:unit:all`, but note that some are non-deterministic where a failure doesn't necessarily mean the code is wrong).
 
