@@ -26,9 +26,10 @@ module Cryptopals
         @cipher.reset
         @cipher.encrypt
         k, n = set_cipher_params(opts)
+        o = opts[:offset] || 0
 
         out = data.to_slices(@bs).map.with_index do |b, i|
-          cnt = @counter.call(@bs, n, i)
+          cnt = @counter.call(@bs, n, i + o)
           key = (@cipher.update(cnt) + @cipher.final).slice(0, b.length)
           b.xor_with(key)
         end.join
