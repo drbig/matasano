@@ -4,9 +4,17 @@ module Cryptopals
   class RNGError < Error; end
 
   module RNG
-    class MT19937
+    class Base
       include Enumerable
 
+      def random; 4; end
+
+      def each
+        loop do yield random end
+      end
+    end
+
+    class MT19937 < Base
       attr_reader :seed
       attr_accessor :index, :state
 
@@ -21,6 +29,8 @@ module Cryptopals
         1.upto(623) do |i|
           @state[i] = (1812433253 * (@state[i - 1] ^ (@state[i - 1] >> 30) + i)) & 0xffffffff
         end
+
+        self
       end
 
       def random
@@ -32,10 +42,6 @@ module Cryptopals
         y ^= ((y << 7)  & 2636928640)
         y ^= ((y << 15) & 4022730752)
         y ^= y >> 18
-      end
-
-      def each
-        loop do yield random end
       end
 
       def clone(&source)
@@ -53,6 +59,8 @@ module Cryptopals
           2.times { n = y ^ (n >> 11) }
           @state[i] = n
         end
+
+        self
       end
 
       private
@@ -62,6 +70,22 @@ module Cryptopals
           @state[i] = @state[(i + 397) % 624] ^ (y >> 1)
           @state[i] = @state[i] ^ 2567483615 if y % 2 != 0
         end
+      end
+    end
+
+    class ByteStream < Base
+      def initialize(rng)
+        @rng = rng
+        @pool = Array.new
+      end
+
+      def random
+        @pool = [@rng.random].pack('L').bytes if @pool.empty?
+        @pool.shift
+      end
+
+      def clear!
+        @pool = Array.new
       end
     end
   end
