@@ -27,11 +27,17 @@ module Cryptopals
         @cipher.encrypt
         k, n = set_cipher_params(opts)
 
-        data.to_slices(@bs).map.with_index do |b, i|
+        out = data.to_slices(@bs).map.with_index do |b, i|
           cnt = @counter.call(@bs, n, i)
           key = (@cipher.update(cnt) + @cipher.final).slice(0, b.length)
           b.xor_with(key)
         end.join
+
+        if opts[:debug]
+          [out, k, n]
+        else
+          out
+        end
       end
 
       private
