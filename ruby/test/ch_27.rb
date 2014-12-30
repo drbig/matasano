@@ -12,7 +12,7 @@ class TestChallenge27 < Minitest::Test
   def setup
     @ki = Cryptopals.random_ascii(16)
     @cb = Cryptopals::Block
-    @cb.set_cipher(OpenSSL::Cipher::AES, 128, :CBC, 
+    @cb.set_cipher(OpenSSL::Cipher::AES, 128, :CBC,
                    :key => @ki, :iv => @ki)
   end
 
