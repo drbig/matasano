@@ -1,6 +1,6 @@
 require 'cryptopals/conv'
 require 'cryptopals/block'
-require 'cryptopals/hash'
+require 'cryptopals/chash'
 require 'cryptopals/rng'
 require 'cryptopals/stream'
 require 'cryptopals/util'

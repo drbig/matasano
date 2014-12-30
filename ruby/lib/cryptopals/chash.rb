@@ -7,7 +7,7 @@ require 'stringio'
 module Cryptopals
   class HashError < Error; end
 
-  module Hash
+  module CHash
     def self.sha1(input, rev = 1, opts = {})
       case rev
       when 1

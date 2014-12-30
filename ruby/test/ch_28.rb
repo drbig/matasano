@@ -2,7 +2,7 @@
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'minitest/autorun'
-require 'cryptopals/hash'
+require 'cryptopals/chash'
 require 'cryptopals/util'
 
 class TestChallenge28 < Minitest::Test
@@ -11,11 +11,11 @@ class TestChallenge28 < Minitest::Test
   end
 
   def sign(msg)
-    Cryptopals::Hash.sha1(@key + msg)
+    Cryptopals::CHash.sha1(@key + msg)
   end
 
   def verify(msg, sig)
-    sig == Cryptopals::Hash.sha1(@key + msg)
+    sig == Cryptopals::CHash.sha1(@key + msg)
   end
 
   def test_ch_28
@@ -37,7 +37,7 @@ class TestChallenge28 < Minitest::Test
     end
     0.upto(255) do |b|
       next if b.chr == @key
-      s = Cryptopals::Hash.sha1(b.chr + m)
+      s = Cryptopals::CHash.sha1(b.chr + m)
       assert !verify(m, s)
     end
   end

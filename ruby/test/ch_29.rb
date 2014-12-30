@@ -2,7 +2,7 @@
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'minitest/autorun'
-require 'cryptopals/hash'
+require 'cryptopals/chash'
 require 'cryptopals/util'
 
 class TestChallenge29 < Minitest::Test
@@ -11,11 +11,11 @@ class TestChallenge29 < Minitest::Test
   end
 
   def sign(msg)
-    Cryptopals::Hash.sha1(@key + msg)
+    Cryptopals::CHash.sha1(@key + msg)
   end
 
   def verify(msg, sig)
-    sig == Cryptopals::Hash.sha1(@key + msg)
+    sig == Cryptopals::CHash.sha1(@key + msg)
   end
 
   def comment_parse(data)
@@ -43,9 +43,9 @@ class TestChallenge29 < Minitest::Test
     am = nil
     ks = 6.upto(16) do |i|
       si = i + m.length
-      p = Cryptopals::Hash.fips_180_pad(si)
+      p = Cryptopals::CHash.fips_180_pad(si)
       am = m + p + t
-      as = Cryptopals::Hash.fips_180_1(t, :from => s, :size => si)
+      as = Cryptopals::CHash.fips_180_1(t, :from => s, :size => si)
       break i if verify(am, as)
     end
 
