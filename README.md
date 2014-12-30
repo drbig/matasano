@@ -32,11 +32,16 @@ Current status: **fun in progress**, at [Set 4](http://cryptopals.com/sets/4/)
   23. [Clone an MT19937 RNG from its output](http://cryptopals.com/sets/3/challenges/23) - **Done**
   24. [Create the MT19937 stream cipher and break it](http://cryptopals.com/sets/3/challenges/24) - **Done**
 - Set 4
-  25. [Break "random access read/write" AES CTR](http://cryptopals.com/sets/4/challenges/25) - In progress
+  25. [Break "random access read/write" AES CTR](http://cryptopals.com/sets/4/challenges/25) - **Done**
+  26. [CTR bitflipping](http://cryptopals.com/sets/4/challenges/26) - **Done**
+  27. [Recover the key from CBC with IV=Key](http://cryptopals.com/sets/4/challenges/27) - **Done**
+  28. [Implement a SHA-1 keyed MAC](http://cryptopals.com/sets/4/challenges/28) - **Done**
+  29. [Break a SHA-1 keyed MAC using length extension](http://cryptopals.com/sets/4/challenges/29) - **Done**
+  30. [Break an MD4 keyed MAC using length extension](http://cryptopals.com/sets/4/challenges/30) - In progress
 
-~~*All hacking is done in Ruby, in a single file*. I prefer this free-form style where I mix my functions and test snippets, commenting stuff in and out. I plan to separate the functions and test cases into some sane file hierarchy once I feel I'm done with the challenges themselves. I'm even tempted to wrap it all as a test suite or Rakefile.~~
+~~*All hacking is done in Ruby, in a single file*. I prefer this free-form style where I mix my functions and test snippets, commenting stuff in and out. I plan to separate the functions and test cases into some sane file hierarchy once I feel I'm done with the challenges themselves. I'm even tempted to wrap it all as a test suite or Rakefile.~~ All is 'proper' now.
 
-All of the code here is 100% genuine own code, done by me. No looksees, copy & paste etc. I might have looked up the theory of some topics in proper literature though (you should too, probably).
+All of the code here is 100% genuine own code, done by me. No looksees, copy & paste (unless that was a part of the exercise) etc. I might have looked up the theory of some topics in proper literature though (you should too, probably).
 
 Currently Sets 1 - 3 are done 'properly' in Ruby:
 
