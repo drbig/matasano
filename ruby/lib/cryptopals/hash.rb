@@ -1,28 +1,41 @@
 # coding: ascii
 require 'cryptopals'
 require 'cryptopals/conv'
+require 'cryptopals/util'
 require 'stringio'
 
 module Cryptopals
   class HashError < Error; end
 
   module Hash
-    def self.sha1(input, rev = 1)
+    def self.sha1(input, rev = 1, opts = {})
       case rev
       when 1
-        fips_180_1(input)
+        fips_180_1(input, opts)
       when 2
-        fips_180_2(input)
+        fips_180_2(input, opts)
       else
         raise HashError, 'no such FIPS 180 revision'
       end
+    end
+
+    # c&p from fips_180_1
+    def self.fips_180_pad(size)
+      input = 'A' * size
+      mask = 0xffffffff
+      bit_len = input.size << 3
+      input += "\x80"
+      input += "\x00" while (input.size % 64) != 56
+      input += [bit_len >> 32, bit_len & mask].pack('N2')
+      raise HashError, 'failed to pad to correct length' if (input.size % 64) != 0
+      input.slice(size, input.length)
     end
 
     # after http://rosettacode.org/wiki/SHA-1#Ruby
     #
     # This is a simple, pure-Ruby implementation of SHA-1, following
     # the algorithm in FIPS 180-1.
-    def self.fips_180_1(input)
+    def self.fips_180_1(input, opts = {})
       # fix encoding
       input = input.force_encoding('ascii-8bit')
 
@@ -38,9 +51,22 @@ module Cryptopals
       k = [0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6].freeze
 
       # initial hash
-      h = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0]
+      if opts[:from]
+        h = opts[:from].from_hex.to_slices(4).map {|e| e.unpack('N').first }
+      else
+        h = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0]
+      end
 
-      bit_len = input.size << 3
+      if opts[:size]
+        bit_len = opts[:size] + 1
+        bit_len += 1 while (bit_len % 64) != 56
+        bit_len += 8
+        bit_len += input.size
+        bit_len = bit_len << 3
+      else
+        bit_len = input.size << 3
+      end
+
       input += "\x80"
       input += "\x00" while (input.size % 64) != 56
       input += [bit_len >> 32, bit_len & mask].pack('N2')
@@ -76,7 +102,7 @@ module Cryptopals
     #
     # FIPS 180-2 -- relevant section #'s below
     # Pulls parts from Wiki pseudocode and http://ruby.janlelis.de/17-sha-256
-    def self.fips_180_2(input)
+    def self.fips_180_2(input, opts = {})
       # fix encoding
       input = input.force_encoding('ascii-8bit')
 
