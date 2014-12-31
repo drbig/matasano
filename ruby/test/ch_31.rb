@@ -11,6 +11,8 @@ class TestChallenge31 < Minitest::Test
   CHARS = ('a'..'f').to_a + ('0'..'9').to_a
 
   def setup
+    skip 'takes too long to include here'
+
     @pid = Process.spawn("#{WEB} #{DELAY}", 2 => '/dev/null', 1 => '/dev/null')
     sleep 2 # whatever
   end
@@ -48,6 +50,7 @@ class TestChallenge31 < Minitest::Test
         end
         time = Time.now.to_f - start
         if time > t
+          print '.'
           s += c
           t += 0.0499
           f = true
@@ -56,16 +59,19 @@ class TestChallenge31 < Minitest::Test
       end
 
       unless f
-        pp 'fail'
-        exit
+        print "\n"
+        flunk "didn't work\n"
       end
     end
+    print "\n"
 
     assert_equal ps, s
   end
 
   def teardown
-    req('quit')
-    Process.waitpid(@pid)
+    unless skipped?
+      req('quit')
+      Process.waitpid(@pid)
+    end
   end
 end

@@ -5,14 +5,14 @@ require 'minitest/autorun'
 require 'cryptopals/chash'
 require 'open-uri'
 
-require 'pp'
-
 class TestChallenge32 < Minitest::Test
   WEB = File.join(File.dirname(__FILE__), 'web_ch_31.rb')
   DELAY = '0.005'
   CHARS = (('a'..'f').to_a + ('0'..'9').to_a).shuffle
 
   def setup
+    skip 'takes too long to include here'
+
     @pid = Process.spawn("#{WEB} #{DELAY}", 2 => '/dev/null', 1 => '/dev/null')
     sleep 1 # whatever
   end
@@ -32,7 +32,7 @@ class TestChallenge32 < Minitest::Test
     p = "test/#{f}/"
 
     k = req('key')
-    pp ps = Cryptopals::CHash.hmac(k, f)
+    ps = Cryptopals::CHash.hmac(k, f)
 
     s = String.new
     r = true
@@ -45,7 +45,7 @@ class TestChallenge32 < Minitest::Test
         5.times do
           start = Time.now.to_f
           if req(p + s + c)
-            pp s += c
+            s += c
             r = false
             f = true
             break
@@ -55,21 +55,28 @@ class TestChallenge32 < Minitest::Test
         break unless r
         time = tms.inject(0.0) {|a, x| a += x } / tms.size.to_f
         if time > t
-          pp s += c
+          print '.'
+          s += c
           t = time + 0.004
           f = true
           break
         end
       end
 
-      fail unless f
+      unless f
+        print "\n"
+        flunk "didn't work\n"
+      end
     end
+    print "\n"
 
     assert_equal ps, s
   end
 
   def teardown
-    req('quit')
-    Process.waitpid(@pid)
+    unless skipped?
+      req('quit')
+      Process.waitpid(@pid)
+    end
   end
 end
