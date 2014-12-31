@@ -2,7 +2,7 @@
 
 Sharing my progress and solutions to the [the matasano crypto challenges](http://cryptopals.com/). Obviously, this is one big **spoiler**. You have been warned.
 
-Current status: **fun in progress**, at [Set 4](http://cryptopals.com/sets/4/)
+Current status: **fun in progress**, at [Set 5](http://cryptopals.com/sets/5/)
 
 - Set 1
   1. [Convert hex to base64](http://cryptopals.com/sets/1/challenges/1) - **Done**
@@ -37,23 +37,27 @@ Current status: **fun in progress**, at [Set 4](http://cryptopals.com/sets/4/)
   27. [Recover the key from CBC with IV=Key](http://cryptopals.com/sets/4/challenges/27) - **Done**
   28. [Implement a SHA-1 keyed MAC](http://cryptopals.com/sets/4/challenges/28) - **Done**
   29. [Break a SHA-1 keyed MAC using length extension](http://cryptopals.com/sets/4/challenges/29) - **Done**
-  30. [Break an MD4 keyed MAC using length extension](http://cryptopals.com/sets/4/challenges/30) - In progress
+  30. [Break an MD4 keyed MAC using length extension](http://cryptopals.com/sets/4/challenges/30) - **Done**
+  31. [Implement and break HMAC-SHA1 with an artificial timing leak](http://cryptopals.com/sets/4/challenges/31) - **Done**
+  32. [Break HMAC-SHA1 with a slightly less artificial timing leak](http://cryptopals.com/sets/4/challenges/32) - *Probably done*
+- Set 5
+  33. [Implement Diffie-Hellman](http://cryptopals.com/sets/5/challenges/33) - In progress
 
 ~~*All hacking is done in Ruby, in a single file*. I prefer this free-form style where I mix my functions and test snippets, commenting stuff in and out. I plan to separate the functions and test cases into some sane file hierarchy once I feel I'm done with the challenges themselves. I'm even tempted to wrap it all as a test suite or Rakefile.~~ All is 'proper' now.
 
 All of the code here is 100% genuine own code, done by me. No looksees, copy & paste (unless that was a part of the exercise) etc. I might have looked up the theory of some topics in proper literature though (you should too, probably).
 
-Currently Sets 1 - 3 are done 'properly' in Ruby:
+Currently Sets 1 - 4 are done 'properly' in Ruby:
 
     $ cd ruby && rake test:challenge:all
-    Run options: -v --seed 30554
+    Run options: -v --seed 53015
     
     # Running:
     
     TestChallenge01#test_ch_01 = 0.00 s = .
     TestChallenge02#test_ch_02 = 0.00 s = .
     TestChallenge03#test_ch_03 = 0.01 s = .
-    TestChallenge04#test_ch_04 = 1.62 s = .
+    TestChallenge04#test_ch_04 = 1.64 s = .
     TestChallenge05#test_ch_05 = 0.00 s = .
     TestChallenge06#test_ch_06 = 0.41 s = .
     TestChallenge07#test_ch_07 = 0.00 s = .
@@ -61,21 +65,38 @@ Currently Sets 1 - 3 are done 'properly' in Ruby:
     TestChallenge09#test_ch_09 = 0.00 s = .
     TestChallenge10#test_ch_10 = 0.01 s = .
     TestChallenge11#test_ch_11 = 0.00 s = .
-    TestChallenge12#test_ch_12 = 0.37 s = .
+    TestChallenge12#test_ch_12 = 0.39 s = .
     TestChallenge13#test_ch_13 = 0.00 s = .
-    TestChallenge14#test_ch_14 = 4.60 s = .
+    TestChallenge14#test_ch_14 = 4.63 s = .
     TestChallenge15#test_ch_15 = 0.00 s = .
     TestChallenge16#test_ch_16 = 0.00 s = .
     TestChallenge17#test_ch_17 = 0.44 s = .
     TestChallenge18#test_ch_18 = 0.00 s = .
     TestChallenge20#test_ch_20 = 0.45 s = .
-    TestChallenge22#test_ch_22 = 0.80 s = .
+    TestChallenge22#test_ch_22 = 0.48 s = .
     TestChallenge23#test_ch_23 = 0.01 s = .
-    TestChallenge24#test_ch_24 = 5.60 s = .
+    TestChallenge24#test_ch_24 = 25.50 s = .
+    TestChallenge25#test_ch_25 = 0.02 s = .
+    TestChallenge26#test_ch_26 = 0.00 s = .
+    TestChallenge27#test_ch_27 = 0.00 s = .
+    TestChallenge28#test_ch_28 = 0.15 s = .
+    TestChallenge29#test_ch_29 = 0.00 s = .
+    TestChallenge30#test_ch_29 = 0.00 s = .
+    TestChallenge31#test_ch_31 = 0.00 s = S
+    TestChallenge32#test_ch_32 = 0.00 s = S
     
-    Finished in 14.445771s, 1.5229 runs/s, 21.0442 assertions/s.
+    Finished in 34.276145s, 0.8752 runs/s, 24.6819 assertions/s.
     
-    22 runs, 304 assertions, 0 failures, 0 errors, 0 skips
+      1) Skipped:
+    TestChallenge31#test_ch_31 [/home/drbig/Projects/small/cryptopals/ruby/test/ch_31.rb:14]:
+    takes too long to include here
+    
+    
+      2) Skipped:
+    TestChallenge32#test_ch_32 [/home/drbig/Projects/small/cryptopals/ruby/test/ch_32.rb:14]:
+    takes too long to include here
+    
+    30 runs, 846 assertions, 0 failures, 0 errors, 2 skips
 
 There are also unit tests for the library (`rake test:unit:all`, but note that some are non-deterministic where a failure doesn't necessarily mean the code is wrong).
 
