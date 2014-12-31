@@ -8,6 +8,89 @@ module Cryptopals
   class HashError < Error; end
 
   module CHash
+    # c&p from md4
+    def self.md4_pad(size)
+      input = 'A' * size
+      mask = (1 << 32) - 1
+      bit_len = input.size << 3
+      input += "\x80"
+      input += "\x00" while (input.size % 64) != 56
+      input += [bit_len & mask, bit_len >> 32].pack("V2")
+      raise HashError, 'failed to pad to correct length' if (input.size % 64) != 0
+      input.slice(size, input.length)
+    end
+
+    # after http://rosettacode.org/wiki/MD4#Ruby
+    #
+    def self.md4(input, opts = {})
+      # fix encoding
+      input = input.force_encoding('ascii-8bit')
+
+      # functions
+      mask = (1 << 32) - 1
+      f = proc {|x, y, z| x & y | x.^(mask) & z}
+      g = proc {|x, y, z| x & y | x & z | y & z}
+      h = proc {|x, y, z| x ^ y ^ z}
+      r = proc {|v, s| (v << s).&(mask) | (v.&(mask) >> (32 - s))}
+
+      # initial hash
+      if opts[:from]
+        a, b, c, d = opts[:from].from_hex.to_slices(4).map {|e| e.unpack('V').first }
+      else
+        a, b, c, d = 0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476
+      end
+
+      if opts[:size]
+        bit_len = opts[:size] + 1
+        bit_len += 1 while (bit_len % 64) != 56
+        bit_len += 8
+        bit_len += input.size
+        bit_len = bit_len << 3
+      else
+        bit_len = input.size << 3
+      end
+
+      input += "\x80"
+      input += "\x00" while (input.size % 64) != 56
+      input += [bit_len & mask, bit_len >> 32].pack("V2")
+
+      raise HashError, 'failed to pad to correct length' if (input.size % 64) != 0
+
+      io = StringIO.new(input)
+      block = ''
+
+      while io.read(64, block)
+        x = block.unpack('V16')
+
+        # Process this block.
+        aa, bb, cc, dd = a, b, c, d
+        [0, 4, 8, 12].each {|i|
+          a = r[a + f[b, c, d] + x[i],  3]; i += 1
+          d = r[d + f[a, b, c] + x[i],  7]; i += 1
+          c = r[c + f[d, a, b] + x[i], 11]; i += 1
+          b = r[b + f[c, d, a] + x[i], 19]
+        }
+        [0, 1, 2, 3].each {|i|
+          a = r[a + g[b, c, d] + x[i] + 0x5a827999,  3]; i += 4
+          d = r[d + g[a, b, c] + x[i] + 0x5a827999,  5]; i += 4
+          c = r[c + g[d, a, b] + x[i] + 0x5a827999,  9]; i += 4
+          b = r[b + g[c, d, a] + x[i] + 0x5a827999, 13]
+        }
+        [0, 2, 1, 3].each {|i|
+          a = r[a + h[b, c, d] + x[i] + 0x6ed9eba1,  3]; i += 8
+          d = r[d + h[a, b, c] + x[i] + 0x6ed9eba1,  9]; i -= 4
+          c = r[c + h[d, a, b] + x[i] + 0x6ed9eba1, 11]; i += 8
+          b = r[b + h[c, d, a] + x[i] + 0x6ed9eba1, 15]
+        }
+        a = (a + aa) & mask
+        b = (b + bb) & mask
+        c = (c + cc) & mask
+        d = (d + dd) & mask
+      end
+
+      [a, b, c, d].pack('V4').unpack('H*').first
+    end
+
     def self.sha1(input, rev = 1, opts = {})
       case rev
       when 1
