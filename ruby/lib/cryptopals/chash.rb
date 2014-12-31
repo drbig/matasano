@@ -2,12 +2,25 @@
 require 'cryptopals'
 require 'cryptopals/conv'
 require 'cryptopals/util'
+require 'cryptopals/xor'
+require 'digest'
 require 'stringio'
 
 module Cryptopals
   class HashError < Error; end
 
   module CHash
+    # after http://en.wikipedia.org/wiki/Hash-based_message_authentication_code#Implementation
+    #
+    # FIPS 192
+    def self.hmac(key, msg, hash = Digest::SHA1, bs = 64)
+      key = hash.digest(key) if key.length > bs
+      key += "\x00" * (bs - key.length) if key.length < bs
+      o_key = key.xor_with(0x5c)
+      i_key = key.xor_with(0x36)
+      hash.hexdigest(o_key + hash.digest(i_key + msg))
+    end
+
     # c&p from md4
     def self.md4_pad(size)
       input = 'A' * size
