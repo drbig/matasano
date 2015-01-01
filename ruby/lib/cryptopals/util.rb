@@ -57,3 +57,17 @@ class String
     end
   end
 end
+
+class Integer
+  def expmod(e, m)
+    raise ArgumentError, 'negative exponent' if e < 0
+    p = 1
+    b = self % m
+    until e.zero?
+      p = (p * b) % m if e.odd?
+      e >>= 1
+      b = (b * b) % m
+    end
+    p
+  end
+end
