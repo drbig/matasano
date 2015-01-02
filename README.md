@@ -1,4 +1,4 @@
-# matasano
+# matasano [![Build Status](https://travis-ci.org/drbig/matasano.svg?branch=master)](https://travis-ci.org/drbig/matasano)
 
 Sharing my progress and solutions to the [the matasano crypto challenges](http://cryptopals.com/). Obviously, this is one big **spoiler**. You have been warned.
 
@@ -43,60 +43,9 @@ Current status: **fun in progress**, at [Set 5](http://cryptopals.com/sets/5/)
 - Set 5
   33. [Implement Diffie-Hellman](http://cryptopals.com/sets/5/challenges/33) - In progress
 
-~~*All hacking is done in Ruby, in a single file*. I prefer this free-form style where I mix my functions and test snippets, commenting stuff in and out. I plan to separate the functions and test cases into some sane file hierarchy once I feel I'm done with the challenges themselves. I'm even tempted to wrap it all as a test suite or Rakefile.~~ All is 'proper' now.
-
 All of the code here is 100% genuine own code, done by me. No looksees, copy & paste (unless that was a part of the exercise) etc. I might have looked up the theory of some topics in proper literature though (you should too, probably).
 
-Currently Sets 1 - 4 are done 'properly' in Ruby:
-
-    $ cd ruby && rake test:challenge:all
-    Run options: -v --seed 53015
-    
-    # Running:
-    
-    TestChallenge01#test_ch_01 = 0.00 s = .
-    TestChallenge02#test_ch_02 = 0.00 s = .
-    TestChallenge03#test_ch_03 = 0.01 s = .
-    TestChallenge04#test_ch_04 = 1.64 s = .
-    TestChallenge05#test_ch_05 = 0.00 s = .
-    TestChallenge06#test_ch_06 = 0.41 s = .
-    TestChallenge07#test_ch_07 = 0.00 s = .
-    TestChallenge08#test_ch_08 = 0.13 s = .
-    TestChallenge09#test_ch_09 = 0.00 s = .
-    TestChallenge10#test_ch_10 = 0.01 s = .
-    TestChallenge11#test_ch_11 = 0.00 s = .
-    TestChallenge12#test_ch_12 = 0.39 s = .
-    TestChallenge13#test_ch_13 = 0.00 s = .
-    TestChallenge14#test_ch_14 = 4.63 s = .
-    TestChallenge15#test_ch_15 = 0.00 s = .
-    TestChallenge16#test_ch_16 = 0.00 s = .
-    TestChallenge17#test_ch_17 = 0.44 s = .
-    TestChallenge18#test_ch_18 = 0.00 s = .
-    TestChallenge20#test_ch_20 = 0.45 s = .
-    TestChallenge22#test_ch_22 = 0.48 s = .
-    TestChallenge23#test_ch_23 = 0.01 s = .
-    TestChallenge24#test_ch_24 = 25.50 s = .
-    TestChallenge25#test_ch_25 = 0.02 s = .
-    TestChallenge26#test_ch_26 = 0.00 s = .
-    TestChallenge27#test_ch_27 = 0.00 s = .
-    TestChallenge28#test_ch_28 = 0.15 s = .
-    TestChallenge29#test_ch_29 = 0.00 s = .
-    TestChallenge30#test_ch_29 = 0.00 s = .
-    TestChallenge31#test_ch_31 = 0.00 s = S
-    TestChallenge32#test_ch_32 = 0.00 s = S
-    
-    Finished in 34.276145s, 0.8752 runs/s, 24.6819 assertions/s.
-    
-      1) Skipped:
-    TestChallenge31#test_ch_31 [/home/drbig/Projects/small/cryptopals/ruby/test/ch_31.rb:14]:
-    takes too long to include here
-    
-    
-      2) Skipped:
-    TestChallenge32#test_ch_32 [/home/drbig/Projects/small/cryptopals/ruby/test/ch_32.rb:14]:
-    takes too long to include here
-    
-    30 runs, 846 assertions, 0 failures, 0 errors, 2 skips
+The challenges are now run by [Travis](https://travis-ci.org/drbig/matasano). Note that my code requires a *modern* Ruby - 2.1.5 should work, 1.9.3 and below probably wont.
 
 There are also unit tests for the library (`rake test:unit:all`, but note that some are non-deterministic where a failure doesn't necessarily mean the code is wrong).
 
@@ -106,7 +55,13 @@ The general idea is to have the unit tests not depend on the challenges data inp
 
 Ruby really kicks ass when it comes to hacking and *learning* new things. Go not so much, but I've learned that Unicode-centric approach is problematic for hacking ASCII-based crypto. I don't see any real speed difference between my Ruby code and my Go code.
 
+I've deleted the Go sources as I'm not going to get back to them.
+
+Having done the first four sets: this stuff is both amazingly eye-opening and scary at the same time. Are you seeding your PRNGs with current time (in NTP-synchronized world...)? Do you think SHA1(key || msg) is a secure way to do a MAC? Well, if so you're doing it very wrong, and that's just the tip of the proverbial iceberg.
+
 ### High-level spoilers
+
+Note: last update around end of Set 2.
 
 Reading code is one thing, knowing the right output is another. If you believe knowing the right outputs is *really* the thing that will help you *understand* what's going on have a looksee [here](https://github.com/drbig/matasano/blob/master/SPOILERS.txt). There are also some spoilerific/sanity-ensuring notes.
 
