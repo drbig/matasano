@@ -79,6 +79,13 @@ class TestChallenge35 < Minitest::Test
     # g = p - 1 -> key = (p - 1).to_s OR 1.to_s !! 
     # unless we fix it with pub_a = 1 and pub_b = 1
     # then key = 1.to_s
+    #
+    # i guess this excercise is more for ECDH, but for
+    # plain DH why not just inject A and B as 0 and don't
+    # care at all for p and g. it seems like a good idea
+    # to check the parameters in such negotiating schemes
+    # e.g. p > 0, g > 1, |p - g| > some bigger number,
+    # A > 1, B > 1 etc.
 
     def initialize(other, g)
       @seen = Array.new
