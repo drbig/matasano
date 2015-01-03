@@ -41,11 +41,16 @@ Current status: **fun in progress**, at [Set 5](http://cryptopals.com/sets/5/)
   31. [Implement and break HMAC-SHA1 with an artificial timing leak](http://cryptopals.com/sets/4/challenges/31) - **Done**
   32. [Break HMAC-SHA1 with a slightly less artificial timing leak](http://cryptopals.com/sets/4/challenges/32) - *Probably done*
 - Set 5
-  33. [Implement Diffie-Hellman](http://cryptopals.com/sets/5/challenges/33) - In progress
+  33. [Implement Diffie-Hellman](http://cryptopals.com/sets/5/challenges/33) - **Done**
+  34. [Implement a MITM key-fixing attack on Diffie-Hellman with parameter injection](http://cryptopals.com/sets/5/challenges/34) - **Done**
+  35. [Implement DH with negotiated groups, and break with malicious "g" parameters](http://cryptopals.com/sets/5/challenges/35) - **Done**
+  36. [Implement Secure Remote Password (SRP)](http://cryptopals.com/sets/5/challenges/36) - **Done**
+  37. [Break SRP with a zero key](http://cryptopals.com/sets/5/challenges/37) - **Done**
+  38. [Offline dictionary attack on simplified SRP](http://cryptopals.com/sets/5/challenges/38) - In the pipeline
 
 All of the code here is 100% genuine own code, done by me. No looksees, copy & paste (unless that was a part of the exercise) etc. I might have looked up the theory of some topics in proper literature though (you should too, probably).
 
-The challenges are now run by [Travis](https://travis-ci.org/drbig/matasano). Note that my code requires a *modern* Ruby - 2.1.5 should work, 1.9.3 and below probably wont.
+The challenges are now run by [Travis](https://travis-ci.org/drbig/matasano). Note that my code requires a *modern* Ruby - 2.1.5 should work, 1.9.3 and below probably won't.
 
 There are also unit tests for the library (`rake test:unit:all`, but note that some are non-deterministic where a failure doesn't necessarily mean the code is wrong).
 
