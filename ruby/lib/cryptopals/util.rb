@@ -70,4 +70,21 @@ class Integer
     end
     p
   end
+
+  # after http://en.m.wikipedia.org/wiki/Extended_Euclidean_algorithm#Modular_integers
+  #
+  def invmod(n)
+    t = 0
+    r = n
+    newt = 1
+    newr = self
+    until newr.zero?
+      q = r / newr
+      t, newt = newt, t - q * newt
+      r, newr = newr, r - q * newr
+    end
+    return nil if r > 1
+    t += n if t < 0
+    t
+  end
 end
