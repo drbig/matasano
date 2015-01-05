@@ -2,7 +2,7 @@
 
 Sharing my progress and solutions to the [the matasano crypto challenges](http://cryptopals.com/). Obviously, this is one big **spoiler**. You have been warned.
 
-Current status: **fun in progress**, at [Set 5](http://cryptopals.com/sets/5/)
+Current status: *on hiatus*
 
 - Set 1
   1. [Convert hex to base64](http://cryptopals.com/sets/1/challenges/1) - **Done**
@@ -46,7 +46,9 @@ Current status: **fun in progress**, at [Set 5](http://cryptopals.com/sets/5/)
   35. [Implement DH with negotiated groups, and break with malicious "g" parameters](http://cryptopals.com/sets/5/challenges/35) - **Done**
   36. [Implement Secure Remote Password (SRP)](http://cryptopals.com/sets/5/challenges/36) - **Done**
   37. [Break SRP with a zero key](http://cryptopals.com/sets/5/challenges/37) - **Done**
-  38. [Offline dictionary attack on simplified SRP](http://cryptopals.com/sets/5/challenges/38) - In the pipeline
+  38. [Offline dictionary attack on simplified SRP](http://cryptopals.com/sets/5/challenges/38) - Protocol done, no cracking attempted (for now)
+  39. [Implement RSA](http://cryptopals.com/sets/5/challenges/39) - **Done**
+  40. [Implement an E=3 RSA Broadcast attack](http://cryptopals.com/sets/5/challenges/40) - **Done**
 
 All of the code here is 100% genuine own code, done by me. No looksees, copy & paste (unless that was a part of the exercise) etc. I might have looked up the theory of some topics in proper literature though (you should too, probably).
 
@@ -74,4 +76,4 @@ Reading code is one thing, knowing the right output is another. If you believe k
 
 Licensed under [CC BY-NC-SA](http://creativecommons.org/licenses/by-nc-sa/4.0/), see LICENSE.txt for details.
 
-Copyright (c) 2014 Piotr S. Staszewski
+Copyright (c) 2014 - 2015 Piotr S. Staszewski
