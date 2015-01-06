@@ -5,16 +5,15 @@ require 'minitest/autorun'
 require 'cryptopals/pkey'
 require 'cryptopals/util'
 
-# 64 bit key length is a cheat. For anything real a better
-# integer cube root function would be required.
 class TestChallenge40 < Minitest::Test
   def test_ch_40
     10.times do
       # plaintext to encrypt
-      p = Cryptopals.random_ascii(8)
+      p = Cryptopals.random_ascii(32 + rand(33))
       # get three samples, each under new random key
       data = 3.times.collect do
-        r = Cryptopals::PKey::RSA.new(:bits => 64)
+        # use 512 bit long key to speed this test up
+        r = Cryptopals::PKey::RSA.new(:bits => 512)
         # collect ciphertext and public modulus
         [r.encrypt(p), r.pub_key.last] #
       end
@@ -29,17 +28,12 @@ class TestChallenge40 < Minitest::Test
       nall = ns.inject(1) {|a, x| a * x }
       # finalize result
       res %= nall
-      # in a perfect world we would just get an exact cube root,
-      # but floats are crap, mathn and ** (1r/3) is crap too,
-      # and I'm too lazy for Newton's method
-      almost = Math.cbrt(res).to_i
-      while (diff = res - (almost ** 3)) != 0
-        diff < 0 ? almost -= 1 : almost += 1
-      end
+      # cube root proper (Newton's method)
+      plainnum = res.nroot(3)
       # uncheese the plainnumber to plaintext
-      plain = almost.to_s(16).from_hex
+      plaintext = plainnum.to_s(16).from_hex
       # voila
-      assert_equal p, plain
+      assert_equal p, plaintext
     end
   end
 end
