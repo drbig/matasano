@@ -87,4 +87,15 @@ class Integer
     t += n if t < 0
     t
   end
+
+  # nth root Newton's method
+  def nroot(n)
+    u, s = self, self + 1
+    while u < s
+      s = u
+      t = (n - 1) * s + self / (s ** (n - 1))
+      u = t / n
+    end
+    s
+  end
 end
